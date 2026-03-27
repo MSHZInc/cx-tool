@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSHZ CX Decision Engine — Retool App</title>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   MSHZ CX DECISION ENGINE
+   Retool HTML Component — Paste entire file contents into
+   a Retool HTML component. No external dependencies needed.
+   Version: 2.0 | Based on V2 Agent Guide
+   ═══════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #ffffff;
+  --bg2:      #f8f8f6;
+  --bg3:      #f2f1ee;
+  --bg-info:  #e6f1fb;
+  --bg-ok:    #eaf3de;
+  --bg-warn:  #faeeda;
+  --bg-err:   #fcebeb;
+  --t1:       #1a1a18;
+  --t2:       #595958;
+  --t3:       #888780;
+  --t-info:   #0c447c;
+  --t-ok:     #27500a;
+  --t-warn:   #633806;
+  --t-err:    #791f1f;
+  --bd:       rgba(0,0,0,0.10);
+  --bd2:      rgba(0,0,0,0.18);
+  --blue:     #378add;
+  --green:    #1d9e75;
+  --amber:    #ef9f27;
+  --red:      #e24b4a;
+  --navy:     #1f3864;
+  --r-sm:     6px;
+  --r-md:     8px;
+  --r-lg:     12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-size: 13px;
+  color: var(--t1);
+  background: var(--bg3);
+}
+
+/* ── LAYOUT ──────────────────────────────────────────────── */
+#app   { display:flex; height:100vh; min-height:700px; overflow:hidden; }
+#sb    { width:200px; min-width:200px; background:var(--bg); border-right:1px solid var(--bd); display:flex; flex-direction:column; }
+#main  { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+#topbar{ height:44px; min-height:44px; background:var(--bg); border-bottom:1px solid var(--bd); display:flex; align-items:center; padding:0 18px; gap:9px; flex-shrink:0; }
+#content { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:13px; }
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+.sb-logo { padding:14px 16px 12px; border-bottom:1px solid var(--bd); }
+.sb-logo-name { font-size:14px; font-weight:600; color:var(--t1); }
+.sb-logo-sub  { font-size:10px; color:var(--t3); margin-top:2px; }
+.sb-section   { font-size:9px; font-weight:600; color:var(--t3); padding:12px 16px 4px; text-transform:uppercase; letter-spacing:.07em; }
+.sb-item { display:flex; align-items:center; gap:9px; padding:8px 14px; font-size:12px; color:var(--t2); cursor:pointer; border-left:2px solid transparent; transition:background .12s; }
+.sb-item:hover { background:var(--bg2); }
+.sb-item.active { background:var(--bg-info); color:var(--t-info); border-left-color:var(--blue); font-weight:600; }
+.sb-icon { width:14px; height:14px; flex-shrink:0; stroke:currentColor; fill:none; stroke-width:1.6; }
+#topbar-title { font-size:13px; font-weight:600; color:var(--t1); flex:1; }
+
+/* ── PAGES ───────────────────────────────────────────────── */
+.page { display:none; flex-direction:column; gap:13px; }
+.page.active { display:flex; }
+
+/* ── CARDS ───────────────────────────────────────────────── */
+.card { background:var(--bg); border:1px solid var(--bd); border-radius:var(--r-lg); overflow:hidden; }
+.card-hdr { padding:10px 16px; border-bottom:1px solid var(--bd); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.card-hdr-t { font-size:12px; font-weight:600; color:var(--t1); }
+.card-hdr-s { font-size:10px; color:var(--t3); }
+.card-body  { padding:14px 16px; }
+
+/* ── GRID HELPERS ────────────────────────────────────────── */
+.g2 { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:13px; }
+.g3 { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr); gap:13px; }
+.g4 { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+
+/* ── KPI CARDS ───────────────────────────────────────────── */
+.kc  { background:var(--bg2); border-radius:var(--r-md); padding:11px 13px; }
+.kl  { font-size:10px; color:var(--t3); margin-bottom:3px; }
+.kv  { font-size:22px; font-weight:700; color:var(--t1); line-height:1.1; }
+.ks  { font-size:9px; margin-top:3px; }
+.ks-g { color:#3b6d11; } .ks-r { color:#a32d2d; } .ks-a { color:#854f0b; }
+
+/* ── PILLS / BADGES ──────────────────────────────────────── */
+.pill { display:inline-flex; align-items:center; font-size:9px; font-weight:600; padding:2px 8px; border-radius:10px; white-space:nowrap; line-height:1.4; }
+.p-b  { background:var(--bg-info); color:var(--t-info); }
+.p-g  { background:var(--bg-ok);   color:var(--t-ok); }
+.p-r  { background:var(--bg-err);  color:var(--t-err); }
+.p-a  { background:var(--bg-warn); color:var(--t-warn); }
+.p-gr { background:var(--bg3);     color:var(--t2); }
+.p-navy { background:var(--navy);  color:#fff; }
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+button { font-family:inherit; font-size:11px; padding:7px 14px; border-radius:var(--r-md); border:1px solid var(--bd2); background:var(--bg); color:var(--t1); cursor:pointer; transition:background .12s; }
+button:hover { background:var(--bg2); }
+.btn-primary { background:var(--navy); color:#fff; border-color:var(--navy); }
+.btn-primary:hover { background:#162a4e; }
+.btn-sm { padding:4px 10px; font-size:10px; }
+.btn-danger { background:var(--bg-err); color:var(--t-err); border-color:#f09595; }
+
+/* ── INPUTS ──────────────────────────────────────────────── */
+input, select, textarea { font-family:inherit; font-size:11px; padding:7px 10px; border-radius:var(--r-md); border:1px solid var(--bd2); background:var(--bg); color:var(--t1); width:100%; }
+input:focus, select:focus, textarea:focus { outline:none; border-color:var(--blue); }
+.form-lbl { font-size:9px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; }
+.form-field { display:flex; flex-direction:column; gap:4px; }
+
+/* ── CHIPS ───────────────────────────────────────────────── */
+.chip { font-size:9px; padding:3px 10px; border-radius:10px; border:1px solid var(--bd2); background:var(--bg2); color:var(--t2); cursor:pointer; display:inline-block; }
+.chip.on { background:var(--bg-info); color:var(--t-info); border-color:#85b7eb; font-weight:600; }
+
+/* ── AVATARS ─────────────────────────────────────────────── */
+.av { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; flex-shrink:0; }
+.av-k { background:var(--bg-info); color:var(--t-info); }
+.av-j { background:var(--bg-ok);   color:var(--t-ok); }
+.av-h { background:var(--bg-warn); color:var(--t-warn); }
+
+/* ── STATUS STRIPS ───────────────────────────────────────── */
+.alert-strip { background:var(--bg-err);  border:1px solid #f09595; border-radius:var(--r-md); padding:9px 12px; font-size:10px; color:var(--t-err);  line-height:1.5; }
+.warn-strip  { background:var(--bg-warn); border:1px solid #fac775; border-radius:var(--r-md); padding:9px 12px; font-size:10px; color:var(--t-warn); line-height:1.5; }
+.info-strip  { background:var(--bg-info); border:1px solid #85b7eb; border-radius:var(--r-md); padding:9px 12px; font-size:10px; color:var(--t-info); line-height:1.5; }
+.ok-strip    { background:var(--bg-ok);   border:1px solid #97c459; border-radius:var(--r-md); padding:9px 12px; font-size:10px; color:var(--t-ok);   line-height:1.5; }
+
+/* ── DECISION ENGINE ─────────────────────────────────────── */
+.de-mode-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.de-mode { padding:12px; border-radius:var(--r-md); border:1px solid var(--bd2); cursor:pointer; background:var(--bg2); text-align:center; }
+.de-mode.sel { background:var(--bg-info); border-color:#85b7eb; }
+.de-mode-t { font-size:12px; font-weight:600; color:var(--t1); margin-bottom:3px; }
+.de-mode-s { font-size:10px; color:var(--t2); }
+.w-progress { height:3px; background:var(--bg3); border-radius:2px; margin-bottom:10px; overflow:hidden; }
+.w-bar { height:100%; background:var(--blue); border-radius:2px; transition:width .3s; }
+.w-q { font-size:13px; font-weight:600; color:var(--t1); margin-bottom:12px; }
+.w-opts { display:flex; flex-direction:column; gap:7px; }
+.w-opt { padding:10px 14px; border-radius:var(--r-md); border:1px solid var(--bd2); cursor:pointer; font-size:12px; color:var(--t1); background:var(--bg); text-align:left; width:100%; }
+.w-opt:hover { background:var(--bg-info); border-color:#85b7eb; color:var(--t-info); }
+.w-opt.sel { background:var(--bg-info); border-color:var(--blue); color:var(--t-info); font-weight:600; }
+.w-yesno { display:flex; gap:10px; }
+.w-yesno .w-opt { flex:1; text-align:center; }
+.res-green { background:var(--bg-ok);  border:1px solid #97c459; border-radius:var(--r-lg); padding:14px; }
+.res-amber { background:var(--bg-warn);border:1px solid #fac775; border-radius:var(--r-lg); padding:14px; margin-top:8px; }
+.res-t { font-size:12px; font-weight:700; margin-bottom:8px; }
+.res-green .res-t { color:var(--t-ok); }
+.res-amber .res-t { color:var(--t-warn); }
+.step-list { display:flex; flex-direction:column; gap:8px; }
+.step-r { display:flex; gap:9px; align-items:flex-start; }
+.sn { width:19px; height:19px; border-radius:50%; font-size:8px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+.sn-b { background:var(--bg-info); color:var(--t-info); }
+.sn-a { background:var(--bg-warn); color:var(--t-warn); }
+.step-txt { font-size:10px; line-height:1.55; color:var(--t1); }
+.tmpl-tag { display:inline-flex; background:var(--bg-info); color:var(--t-info); font-size:9px; font-weight:600; padding:2px 7px; border-radius:5px; cursor:pointer; margin:2px; border:none; }
+.tmpl-tag:hover { background:#b5d4f4; }
+.sr-item { padding:10px 13px; border-radius:var(--r-md); border:1px solid var(--bd2); cursor:pointer; background:var(--bg); margin-bottom:6px; }
+.sr-item:hover { background:var(--bg-info); border-color:#85b7eb; }
+.sr-title { font-size:11px; font-weight:600; color:var(--t1); }
+.sr-desc  { font-size:9px;  color:var(--t2); margin-top:2px; line-height:1.4; }
+
+/* ── POLICY ──────────────────────────────────────────────── */
+.pol-layout { display:grid; grid-template-columns:230px minmax(0,1fr); height:680px; }
+.pol-list   { border-right:1px solid var(--bd); overflow-y:auto; }
+.pol-item   { padding:10px 13px; border-bottom:1px solid var(--bd); cursor:pointer; }
+.pol-item:hover { background:var(--bg2); }
+.pol-item.sel { background:var(--bg-info); }
+.pol-item-t { font-size:11px; font-weight:600; color:var(--t1); margin-bottom:2px; }
+.pol-item-s { font-size:9px; color:var(--t2); }
+.pol-detail { padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:11px; }
+.pol-section { font-size:10px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; padding-bottom:6px; border-bottom:1px solid var(--bd); margin-bottom:4px; }
+.rule-row { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid var(--bd); align-items:flex-start; }
+.rule-row:last-child { border-bottom:none; }
+.rule-num { font-size:9px; font-weight:700; color:var(--t-info); min-width:26px; flex-shrink:0; margin-top:2px; background:var(--bg-info); border-radius:4px; padding:1px 5px; text-align:center; }
+.rule-text { font-size:10px; color:var(--t1); line-height:1.55; flex:1; }
+.rule-note { font-size:9px; color:var(--t3); margin-top:3px; }
+.rc-tbl { width:100%; border-collapse:collapse; font-size:9px; }
+.rc-tbl th { padding:5px 9px; background:var(--bg3); border:1px solid var(--bd); text-align:left; font-weight:600; color:var(--t2); }
+.rc-tbl td { padding:5px 9px; border:1px solid var(--bd); color:var(--t1); }
+.rc-s { background:#fff2cc; } .rc-c { background:var(--bg); }
+
+/* ── TEMPLATES ───────────────────────────────────────────── */
+.tmpl-layout { display:grid; grid-template-columns:230px minmax(0,1fr); height:680px; }
+.tmpl-list { border-right:1px solid var(--bd); overflow-y:auto; }
+.tmpl-item { display:flex; gap:9px; padding:9px 13px; border-bottom:1px solid var(--bd); cursor:pointer; align-items:flex-start; }
+.tmpl-item:hover { background:var(--bg2); }
+.tmpl-item.sel { background:var(--bg-info); }
+.t-code { font-size:11px; font-weight:700; color:var(--t-info); min-width:32px; flex-shrink:0; }
+.t-name { font-size:11px; font-weight:600; color:var(--t1); margin-bottom:2px; }
+.t-when { font-size:9px; color:var(--t2); line-height:1.3; }
+.tmpl-pane { padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; }
+.preview-body { background:var(--bg2); border-radius:var(--r-md); padding:12px; font-size:10px; color:var(--t1); line-height:1.75; white-space:pre-wrap; font-family:monospace; border:1px solid var(--bd); }
+.var-chip { display:inline-flex; background:var(--bg-info); color:var(--t-info); font-size:9px; padding:2px 7px; border-radius:5px; font-family:monospace; margin:2px; }
+
+/* ── SHIFTS ──────────────────────────────────────────────── */
+.shift-card { background:var(--bg); border:1px solid var(--bd); border-radius:var(--r-lg); padding:14px; }
+.sc-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.sc-name { font-size:13px; font-weight:600; color:var(--t1); }
+.sc-role { font-size:9px; color:var(--t3); }
+.sc-row  { display:flex; justify-content:space-between; font-size:10px; padding:4px 0; border-bottom:1px solid var(--bd); }
+.sc-row:last-child { border-bottom:none; }
+.sc-lbl  { color:var(--t3); }
+.sc-val  { font-weight:600; color:var(--t1); }
+.tt { height:5px; background:var(--bg3); border-radius:3px; overflow:hidden; margin-top:8px; }
+.tt-fill { height:100%; background:var(--blue); border-radius:3px; }
+.sched-tbl { width:100%; border-collapse:collapse; font-size:10px; }
+.sched-tbl th { padding:7px 10px; background:var(--bg2); border:1px solid var(--bd); text-align:left; font-weight:600; color:var(--t2); font-size:9px; }
+.sched-tbl td { padding:7px 10px; border:1px solid var(--bd); color:var(--t1); vertical-align:middle; }
+.cadence-row { display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--bd); font-size:10px; }
+.cadence-row:last-child { border-bottom:none; }
+
+/* ── KPI ─────────────────────────────────────────────────── */
+.agent-kpi-card { background:var(--bg); border:1px solid var(--bd); border-radius:var(--r-lg); overflow:hidden; }
+.akc-head { padding:12px 14px; border-bottom:1px solid var(--bd); display:flex; align-items:center; gap:10px; }
+.akc-body { padding:12px 14px; display:flex; flex-direction:column; gap:8px; }
+.score-ring { width:48px; height:48px; border-radius:50%; border:3px solid var(--blue); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.score-ring.pass { border-color:var(--green); }
+.score-ring.fail { border-color:var(--red); }
+.score-num { font-size:14px; font-weight:700; color:var(--t-info); }
+.score-num.pass { color:#0f6e56; }
+.score-num.fail { color:#a32d2d; }
+.metric-row { display:flex; align-items:center; gap:8px; }
+.metric-lbl { font-size:10px; color:var(--t2); flex:1; }
+.metric-bar { width:90px; height:5px; background:var(--bg3); border-radius:3px; overflow:hidden; }
+.metric-fill { height:100%; border-radius:3px; background:var(--blue); }
+.metric-val { font-size:10px; font-weight:600; color:var(--t1); min-width:34px; text-align:right; }
+.log-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; padding:14px; }
+.tgt-row { display:flex; justify-content:space-between; align-items:center; font-size:10px; padding:5px 0; border-bottom:1px solid var(--bd); }
+.tgt-row:last-child { border-bottom:none; }
+.tgt-lbl { color:var(--t2); }
+.tgt-val { font-weight:600; color:var(--t1); }
+
+/* ── BAR CHARTS (KPI breakdown) ──────────────────────────── */
+.bar-row  { display:flex; align-items:center; gap:8px; font-size:10px; margin-bottom:5px; }
+.bar-bg   { flex:1; height:5px; background:var(--bg3); border-radius:3px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:3px; }
+.bar-lbl  { min-width:28px; font-weight:700; text-align:right; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ══ SIDEBAR ════════════════════════════════════════════ -->
+<div id="sb">
+  <div class="sb-logo">
+    <div class="sb-logo-name">MSHZ CX Tool</div>
+    <div class="sb-logo-sub">Decision Engine · Policy · v2</div>
+  </div>
+  <div class="sb-section">Tools</div>
+  <div class="sb-item active" onclick="nav('decision',this)">
+    <svg class="sb-icon" viewBox="0 0 16 16"><path d="M3 8h4m2 0h4M8 4v4m0 0v4"/><circle cx="8" cy="8" r="6"/></svg>
+    Decision Engine
+  </div>
+  <div class="sb-item" onclick="nav('policy',this)">
+    <svg class="sb-icon" viewBox="0 0 16 16"><path d="M4 2h8a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M6 6h4M6 9h3"/></svg>
+    Policy Dashboard
+  </div>
+  <div class="sb-item" onclick="nav('templates',this)">
+    <svg class="sb-icon" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M5 7h6M5 10h4"/></svg>
+    Templates
+  </div>
+  <div class="sb-section">Team</div>
+  <div class="sb-item" onclick="nav('shifts',this)">
+    <svg class="sb-icon" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+    Shift Schedule
+  </div>
+  <div class="sb-item" onclick="nav('kpi',this)">
+    <svg class="sb-icon" viewBox="0 0 16 16"><polyline points="2,12 5,7 8,9 11,4 14,6"/></svg>
+    Agent KPIs
+  </div>
+</div>
+
+<!-- ══ MAIN ═══════════════════════════════════════════════ -->
+<div id="main">
+  <div id="topbar">
+    <div id="topbar-title">Decision Engine</div>
+    <span class="pill p-r">ODR: keep below 1%</span>
+    <span class="pill p-a">Return response: 48h max</span>
+    <span class="pill p-navy">V2 Guide</span>
+  </div>
+  <div id="content">
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE 1 — DECISION ENGINE
+       ══════════════════════════════════════════════════════ -->
+  <div class="page active" id="p-decision">
+    <div class="de-mode-row">
+      <div class="de-mode sel" id="mode-wizard" onclick="setMode('wizard')">
+        <div class="de-mode-t">Guided Wizard</div>
+        <div class="de-mode-s">Step-by-step — ideal for new agents</div>
+      </div>
+      <div class="de-mode" id="mode-search" onclick="setMode('search')">
+        <div class="de-mode-t">Quick Search</div>
+        <div class="de-mode-s">Keyword lookup — for experienced agents</div>
+      </div>
+    </div>
+
+    <!-- WIZARD PANEL -->
+    <div class="card" id="wizard-panel">
+      <div class="card-hdr">
+        <span class="card-hdr-t" id="w-title">Step 1 of 3 — Select marketplace</span>
+        <button class="btn-sm" onclick="resetWizard()">Reset</button>
+      </div>
+      <div class="card-body">
+        <div class="w-progress"><div class="w-bar" id="w-bar" style="width:33%"></div></div>
+        <div id="w-content"></div>
+      </div>
+    </div>
+
+    <!-- SEARCH PANEL -->
+    <div class="card" id="search-panel" style="display:none">
+      <div class="card-hdr"><span class="card-hdr-t">Quick SOP lookup</span></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:8px">
+          <input type="text" id="sop-input" placeholder="Type keyword: damaged, wrong item, not received, cancel, delayed, listing, technical, discount, address..." oninput="doSearch(this.value)">
+          <button class="btn-primary btn-sm" onclick="doSearch(document.getElementById('sop-input').value)">Search</button>
+        </div>
+        <div id="search-results"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE 2 — POLICY DASHBOARD
+       ══════════════════════════════════════════════════════ -->
+  <div class="page" id="p-policy">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input type="text" id="pol-search-input" placeholder="Search all policies..." oninput="filterPolicies(this.value)" style="max-width:300px">
+      <span class="chip on"  onclick="filterPolCat('all',this)">All</span>
+      <span class="chip" onclick="filterPolCat('refund',this)">Returns & Refunds</span>
+      <span class="chip" onclick="filterPolCat('carrier',this)">Carriers</span>
+      <span class="chip" onclick="filterPolCat('amazon',this)">Amazon Rules</span>
+      <span class="chip" onclick="filterPolCat('kpi',this)">KPI Thresholds</span>
+      <span class="chip" onclick="filterPolCat('conduct',this)">Agent Conduct</span>
+    </div>
+    <div class="card" style="flex:1">
+      <div class="pol-layout">
+        <div class="pol-list" id="pol-list"></div>
+        <div class="pol-detail" id="pol-detail">
+          <div style="color:var(--t3);font-size:12px;text-align:center;margin-top:40px">Select a section on the left to view the policy details.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE 3 — TEMPLATES
+       ══════════════════════════════════════════════════════ -->
+  <div class="page" id="p-templates">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input type="text" id="tmpl-search-input" placeholder="Search templates..." oninput="filterTemplates(this.value)" style="max-width:280px">
+      <span class="chip on" onclick="filterTSeries('all',this)">All</span>
+      <span class="chip" onclick="filterTSeries('a',this)">A-series</span>
+      <span class="chip" onclick="filterTSeries('b',this)">B-series</span>
+      <span class="chip" onclick="filterTSeries('c',this)">C-series</span>
+      <span class="chip" onclick="filterTSeries('d',this)">D-series</span>
+      <span class="chip" onclick="filterTSeries('t',this)">T-series</span>
+    </div>
+    <div class="card" style="flex:1">
+      <div class="tmpl-layout">
+        <div class="tmpl-list" id="tmpl-list"></div>
+        <div class="tmpl-pane" id="tmpl-pane">
+          <div style="color:var(--t3);font-size:12px;text-align:center;margin-top:40px">Select a template to preview it here.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE 4 — SHIFT SCHEDULE
+       ══════════════════════════════════════════════════════ -->
+  <div class="page" id="p-shifts">
+    <div class="g4">
+      <div class="kc"><div class="kl">Agents active today</div><div class="kv">3</div><div class="ks ks-g">All checked in</div></div>
+      <div class="kc"><div class="kl">Weekend coverage</div><div class="kv">Active</div><div class="ks ks-g">Amazon 24h SLA met</div></div>
+      <div class="kc"><div class="kl">Open follow-ups</div><div class="kv">3</div><div class="ks ks-a">Due today (cadence)</div></div>
+      <div class="kc"><div class="kl">Next shift</div><div class="kv">9:00</div><div class="ks">Tomorrow — all 3</div></div>
+    </div>
+    <div class="g2">
+      <div style="display:flex;flex-direction:column;gap:13px">
+        <div class="g3">
+          <div class="shift-card">
+            <div class="sc-head"><div class="av av-k">KR</div><div><div class="sc-name">Kimberly R.</div><div class="sc-role">Senior Agent · AMZ USA/CA · eBay</div></div><span class="pill p-g" style="margin-left:auto">On shift</span></div>
+            <div class="sc-row"><span class="sc-lbl">Check-in</span><span class="sc-val">9:02 AM</span></div>
+            <div class="sc-row"><span class="sc-lbl">Scheduled out</span><span class="sc-val">5:00 PM</span></div>
+            <div class="sc-row"><span class="sc-lbl">Break</span><span class="sc-val">30 min</span></div>
+            <div class="sc-row"><span class="sc-lbl">Tickets today</span><span class="sc-val" style="color:#3b6d11">47</span></div>
+            <div class="tt"><div class="tt-fill" style="width:72%"></div></div>
+          </div>
+          <div class="shift-card">
+            <div class="sc-head"><div class="av av-j">JC</div><div><div class="sc-name">Jobelle C.</div><div class="sc-role">Agent · AMZ CA · eBay · Walmart</div></div><span class="pill p-a" style="margin-left:auto">Late</span></div>
+            <div class="sc-row"><span class="sc-lbl">Check-in</span><span class="sc-val" style="color:#854f0b">9:15 AM (+15)</span></div>
+            <div class="sc-row"><span class="sc-lbl">Scheduled out</span><span class="sc-val">5:00 PM</span></div>
+            <div class="sc-row"><span class="sc-lbl">Break</span><span class="sc-val">30 min</span></div>
+            <div class="sc-row"><span class="sc-lbl">Tickets today</span><span class="sc-val">33</span></div>
+            <div class="tt"><div class="tt-fill" style="width:59%"></div></div>
+          </div>
+          <div class="shift-card">
+            <div class="sc-head"><div class="av av-h">HS</div><div><div class="sc-name">Harleen S.</div><div class="sc-role">Team Lead · Tech · All channels</div></div><span class="pill p-g" style="margin-left:auto">On shift</span></div>
+            <div class="sc-row"><span class="sc-lbl">Check-in</span><span class="sc-val">8:55 AM</span></div>
+            <div class="sc-row"><span class="sc-lbl">Scheduled out</span><span class="sc-val">5:10 PM</span></div>
+            <div class="sc-row"><span class="sc-lbl">Break</span><span class="sc-val">30 min</span></div>
+            <div class="sc-row"><span class="sc-lbl">Tickets today</span><span class="sc-val">21</span></div>
+            <div class="tt"><div class="tt-fill" style="width:38%"></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><span class="card-hdr-t">Weekly schedule — Mar 23–29, 2026</span></div>
+          <div style="padding:12px;overflow-x:auto">
+            <table class="sched-tbl">
+              <thead><tr><th>Agent</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead>
+              <tbody>
+                <tr><td><div style="display:flex;align-items:center;gap:7px"><div class="av av-k" style="width:22px;height:22px;font-size:8px">KR</div>Kimberly</div></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-b">10–2</span></td><td><span class="pill p-gr">Off</span></td></tr>
+                <tr><td><div style="display:flex;align-items:center;gap:7px"><div class="av av-j" style="width:22px;height:22px;font-size:8px">JC</div>Jobelle</div></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-gr">Off</span></td><td><span class="pill p-b">10–2</span></td></tr>
+                <tr><td><div style="display:flex;align-items:center;gap:7px"><div class="av av-h" style="width:22px;height:22px;font-size:8px">HS</div>Harleen</div></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-b">9–1</span></td><td><span class="pill p-gr">Off</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:13px">
+        <div class="card">
+          <div class="card-hdr"><span class="card-hdr-t">Log check-in / check-out</span></div>
+          <div class="log-grid">
+            <div class="form-field" style="grid-column:1/-1"><div class="form-lbl">Agent</div><select><option>Kimberly Ross</option><option>Jobelle Cruz</option><option>Harleen Singh</option></select></div>
+            <div class="form-field"><div class="form-lbl">Action</div><select><option>Check in</option><option>Check out</option><option>Start break</option><option>End break</option></select></div>
+            <div class="form-field"><div class="form-lbl">Time</div><input type="time" value="09:00"></div>
+            <div class="form-field" style="grid-column:1/-1"><div class="form-lbl">Notes (optional)</div><input type="text" placeholder="Late reason, early leave, etc."></div>
+            <div style="grid-column:1/-1"><button class="btn-primary" style="width:100%">Submit log entry</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><span class="card-hdr-t">Follow-up cadence due today</span></div>
+          <div style="padding:10px 14px">
+            <div class="cadence-row"><span class="pill p-a">Day 2</span><span style="flex:1">TKT-006 — first follow-up due</span><button class="btn-sm">Mark sent</button></div>
+            <div class="cadence-row"><span class="pill p-a">Day 2</span><span style="flex:1">CLM-002 — carrier follow-up (USPS)</span><button class="btn-sm">Mark sent</button></div>
+            <div class="cadence-row"><span class="pill p-g">On track</span><span style="flex:1">TKT-022 — listing team 48h check</span><button class="btn-sm">Confirm</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><span class="card-hdr-t">Cadence rules — quick ref</span></div>
+          <div style="padding:10px 14px">
+            <div class="cadence-row"><span class="pill p-b">Day 0</span><span>Send reply. Move to Waiting tab. Add date note.</span></div>
+            <div class="cadence-row"><span class="pill p-gr">Day 1</span><span>No action — allow 1 full business day.</span></div>
+            <div class="cadence-row"><span class="pill p-a">Day 2</span><span>Send first follow-up referencing original issue.</span></div>
+            <div class="cadence-row"><span class="pill p-a">Day 3</span><span>Final follow-up. Warn of closure.</span></div>
+            <div class="cadence-row"><span class="pill p-r">No reply</span><span>Close with D6. Internal note. NOT "Solved" — "Inactive".</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE 5 — AGENT KPIs
+       ══════════════════════════════════════════════════════ -->
+  <div class="page" id="p-kpi">
+    <div class="g4">
+      <div class="kc"><div class="kl">Team avg QA score</div><div class="kv">82<span style="font-size:13px">/100</span></div><div class="ks ks-g">Above 75 pass mark</div></div>
+      <div class="kc"><div class="kl">Avg first response</div><div class="kv">3.1<span style="font-size:13px">h</span></div><div class="ks ks-g">Target: under 24h</div></div>
+      <div class="kc"><div class="kl">Dissatisfaction rate</div><div class="kv">14.3<span style="font-size:13px">%</span></div><div class="ks ks-r">Benchmark: 6.47%</div></div>
+      <div class="kc"><div class="kl">Agents passing QA</div><div class="kv">2/3</div><div class="ks ks-a">1 needs coaching</div></div>
+    </div>
+    <div class="g2">
+      <div style="display:flex;flex-direction:column;gap:13px">
+        <div class="agent-kpi-card">
+          <div class="akc-head"><div class="av av-k">KR</div><div style="flex:1"><div style="font-size:12px;font-weight:700">Kimberly Ross</div><div style="font-size:9px;color:var(--t3)">Senior Agent · Amazon USA/CA, eBay, Shopify</div></div><div class="score-ring pass"><div class="score-num pass">94</div></div><span class="pill p-g">Pass</span></div>
+          <div class="akc-body">
+            <div class="metric-row"><span class="metric-lbl">Tone & professionalism</span><div class="metric-bar"><div class="metric-fill" style="width:90%;background:var(--green)"></div></div><span class="metric-val">18/20</span></div>
+            <div class="metric-row"><span class="metric-lbl">Accuracy</span><div class="metric-bar"><div class="metric-fill" style="width:95%;background:var(--green)"></div></div><span class="metric-val">19/20</span></div>
+            <div class="metric-row"><span class="metric-lbl">SOP adherence</span><div class="metric-bar"><div class="metric-fill" style="width:100%;background:var(--green)"></div></div><span class="metric-val">20/20</span></div>
+            <div class="metric-row"><span class="metric-lbl">Response time</span><div class="metric-bar"><div class="metric-fill" style="width:85%;background:var(--green)"></div></div><span class="metric-val">17/20</span></div>
+            <div class="metric-row"><span class="metric-lbl">Resolution quality</span><div class="metric-bar"><div class="metric-fill" style="width:100%;background:var(--green)"></div></div><span class="metric-val">20/20</span></div>
+            <div style="padding-top:6px;border-top:1px solid var(--bd);font-size:9px;color:var(--t3)">Reviewed Mar 5, 2026 by Harleen S. · Ticket TKT-001</div>
+          </div>
+        </div>
+        <div class="agent-kpi-card">
+          <div class="akc-head"><div class="av av-j">JC</div><div style="flex:1"><div style="font-size:12px;font-weight:700">Jobelle Cruz</div><div style="font-size:9px;color:var(--t3)">Agent · Amazon CA, eBay, Walmart</div></div><div class="score-ring fail"><div class="score-num fail">73</div></div><span class="pill p-r">Fail — coaching</span></div>
+          <div class="akc-body">
+            <div class="metric-row"><span class="metric-lbl">Tone & professionalism</span><div class="metric-bar"><div class="metric-fill" style="width:75%;background:var(--amber)"></div></div><span class="metric-val">15/20</span></div>
+            <div class="metric-row"><span class="metric-lbl">Accuracy</span><div class="metric-bar"><div class="metric-fill" style="width:80%;background:var(--amber)"></div></div><span class="metric-val">16/20</span></div>
+            <div class="metric-row"><span class="metric-lbl">SOP adherence</span><div class="metric-bar"><div class="metric-fill" style="width:70%;background:var(--red)"></div></div><span class="metric-val">14/20</span></div>
+            <div class="metric-row"><span class="metric-lbl">Response time</span><div class="metric-bar"><div class="metric-fill" style="width:80%;background:var(--amber)"></div></div><span class="metric-val">16/20</span></div>
+            <div class="metric-row"><span class="metric-lbl">Resolution quality</span><div class="metric-bar"><div class="metric-fill" style="width:60%;background:var(--red)"></div></div><span class="metric-val">12/20</span></div>
+            <div style="padding-top:6px;border-top:1px solid var(--bd);font-size:9px;color:#a32d2d">Coaching note: Explain refund deductions upfront before escalating. Review SOP-012.</div>
+          </div>
+        </div>
+        <div class="agent-kpi-card">
+          <div class="akc-head"><div class="av av-h">HS</div><div style="flex:1"><div style="font-size:12px;font-weight:700">Harleen Singh</div><div style="font-size:9px;color:var(--t3)">Team Lead · All channels · Tech escalations</div></div><div class="score-ring pass"><div class="score-num pass">89</div></div><span class="pill p-g">Pass</span></div>
+          <div class="akc-body">
+            <div class="metric-row"><span class="metric-lbl">Tone & professionalism</span><div class="metric-bar"><div class="metric-fill" style="width:85%;background:var(--green)"></div></div><span class="metric-val">17/20</span></div>
+            <div class="metric-row"><span class="metric-lbl">Accuracy</span><div class="metric-bar"><div class="metric-fill" style="width:90%;background:var(--green)"></div></div><span class="metric-val">18/20</span></div>
+            <div class="metric-row"><span class="metric-lbl">SOP adherence</span><div class="metric-bar"><div class="metric-fill" style="width:95%;background:var(--green)"></div></div><span class="metric-val">19/20</span></div>
+            <div class="metric-row"><span class="metric-lbl">Response time</span><div class="metric-bar"><div class="metric-fill" style="width:75%;background:var(--amber)"></div></div><span class="metric-val">15/20</span></div>
+            <div class="metric-row"><span class="metric-lbl">Resolution quality</span><div class="metric-bar"><div class="metric-fill" style="width:100%;background:var(--green)"></div></div><span class="metric-val">20/20</span></div>
+            <div style="padding-top:6px;border-top:1px solid var(--bd);font-size:9px;color:var(--t3)">Reviewed Oct 25, 2025 by Supervisor · Ticket TKT-003</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:13px">
+        <div class="card">
+          <div class="card-hdr"><span class="card-hdr-t">Log daily performance</span><span class="card-hdr-s">Self-reported by agents</span></div>
+          <div class="log-grid">
+            <div class="form-field" style="grid-column:1/-1"><div class="form-lbl">Agent</div><select><option>Kimberly Ross</option><option>Jobelle Cruz</option><option>Harleen Singh</option></select></div>
+            <div class="form-field"><div class="form-lbl">Date</div><input type="date" value="2026-03-25"></div>
+            <div class="form-field"><div class="form-lbl">Marketplace</div><select><option>Amazon USA</option><option>Amazon CA</option><option>eBay USA</option><option>eBay CA</option><option>Shopify</option><option>Walmart</option><option>All</option></select></div>
+            <div class="form-field"><div class="form-lbl">Tickets handled</div><input type="number" placeholder="e.g. 32" min="0"></div>
+            <div class="form-field"><div class="form-lbl">Avg first response (min)</div><input type="number" placeholder="e.g. 45" min="0"></div>
+            <div class="form-field"><div class="form-lbl">Resends created</div><input type="number" placeholder="e.g. 3" min="0"></div>
+            <div class="form-field"><div class="form-lbl">Refunds issued</div><input type="number" placeholder="e.g. 2" min="0"></div>
+            <div class="form-field"><div class="form-lbl">Escalations raised</div><input type="number" placeholder="e.g. 1" min="0"></div>
+            <div class="form-field"><div class="form-lbl">Listing reports filed</div><input type="number" placeholder="e.g. 0" min="0"></div>
+            <div class="form-field" style="grid-column:1/-1"><div class="form-lbl">Notes</div><input type="text" placeholder="Pattern alerts, issues for supervisor..."></div>
+            <div style="grid-column:1/-1"><button class="btn-primary" style="width:100%">Submit daily log</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><span class="card-hdr-t">KPI targets — quick reference</span></div>
+          <div style="padding:11px 14px">
+            <div class="tgt-row"><span class="tgt-lbl">Response time — all messages</span><span class="tgt-val">Under 24h · 7 days/week</span></div>
+            <div class="tgt-row"><span class="tgt-lbl">Return request response</span><span class="tgt-val" style="color:#a32d2d">48h max · zero exceptions</span></div>
+            <div class="tgt-row"><span class="tgt-lbl">Order Defect Rate (ODR)</span><span class="tgt-val" style="color:#a32d2d">Below 1% (suspension risk)</span></div>
+            <div class="tgt-row"><span class="tgt-lbl">Buyer contact rate</span><span class="tgt-val">Below 1.63% (now 2.14%)</span></div>
+            <div class="tgt-row"><span class="tgt-lbl">Buyer dissatisfaction rate</span><span class="tgt-val" style="color:#a32d2d">Below 6.47% (now 14.29%)</span></div>
+            <div class="tgt-row"><span class="tgt-lbl">365-day positive feedback</span><span class="tgt-val">Above 90% (now 80%)</span></div>
+            <div class="tgt-row"><span class="tgt-lbl">Monthly QA score</span><span class="tgt-val">75/100 to pass</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><span class="card-hdr-t">Negative review root causes</span><span class="card-hdr-s">18 reviews · Oct 2025–Mar 2026</span></div>
+          <div style="padding:12px 14px">
+            <div class="bar-row"><span style="min-width:130px;font-size:10px;color:var(--t2)">Damaged in transit</span><div class="bar-bg"><div class="bar-fill" style="width:28%;background:var(--red)"></div></div><span class="bar-lbl" style="color:#a32d2d">28%</span></div>
+            <div class="bar-row"><span style="min-width:130px;font-size:10px;color:var(--t2)">Item not received</span><div class="bar-bg"><div class="bar-fill" style="width:22%;background:var(--red)"></div></div><span class="bar-lbl" style="color:#a32d2d">22%</span></div>
+            <div class="bar-row"><span style="min-width:130px;font-size:10px;color:var(--t2)">Listing inaccuracy</span><div class="bar-bg"><div class="bar-fill" style="width:17%;background:var(--amber)"></div></div><span class="bar-lbl" style="color:#854f0b">17%</span></div>
+            <div class="bar-row"><span style="min-width:130px;font-size:10px;color:var(--t2)">Wrong item sent</span><div class="bar-bg"><div class="bar-fill" style="width:17%;background:var(--amber)"></div></div><span class="bar-lbl" style="color:#854f0b">17%</span></div>
+            <div class="bar-row"><span style="min-width:130px;font-size:10px;color:var(--t2)">CS handling</span><div class="bar-bg"><div class="bar-fill" style="width:11%;background:#888780"></div></div><span class="bar-lbl" style="color:#5f5e5a">11%</span></div>
+            <div class="bar-row"><span style="min-width:130px;font-size:10px;color:var(--t2)">Defective, no follow-up</span><div class="bar-bg"><div class="bar-fill" style="width:6%;background:#888780"></div></div><span class="bar-lbl" style="color:#5f5e5a">6%</span></div>
+            <div style="margin-top:8px;font-size:9px;color:var(--t3);padding-top:6px;border-top:1px solid var(--bd)">83% of negatives are upstream ops/listing issues — not CS handling failures.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function nav(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('p-' + id).classList.add('active');
+  el.classList.add('active');
+  const T = { decision:'Decision Engine', policy:'Policy Dashboard', templates:'Template Library', shifts:'Shift Schedule', kpi:'Agent KPI Dashboard' };
+  document.getElementById('topbar-title').textContent = T[id] || id;
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODE TOGGLE
+// ═══════════════════════════════════════════════════════════
+function setMode(m) {
+  document.getElementById('mode-wizard').classList.toggle('sel', m === 'wizard');
+  document.getElementById('mode-search').classList.toggle('sel', m === 'search');
+  document.getElementById('wizard-panel').style.display  = m === 'wizard' ? '' : 'none';
+  document.getElementById('search-panel').style.display  = m === 'search' ? '' : 'none';
+}
+
+// ═══════════════════════════════════════════════════════════
+// WIZARD DATA
+// ═══════════════════════════════════════════════════════════
+var wMkt = '', wInq = '';
+
+var RES = {
+  'cancel-not-shipped': {
+    title: 'SOP-001 — Cancellation: item NOT yet shipped',
+    steps: [
+      'Check Linnworks Open Orders — confirm no label printed in the audit trail.',
+      'Park the order in Linnworks immediately to prevent processing.',
+      'Notify shipping team before cancelling.',
+      'Cancel in order: Linnworks → ShipStation → Marketplace.',
+      'Email buyer confirming cancellation and full refund.'
+    ],
+    templates: ['Cancellation confirmation email'],
+    escalate: 'Shipping label already printed — consult shipping team before any cancellation.'
+  },
+  'cancel-shipped': {
+    title: 'SOP-002 — Cancellation: item already shipped',
+    steps: [
+      'Confirm order is in Processed Orders tab. Check audit trail for dispatch date.',
+      'Notify customer: order has already shipped — cancellation is not possible.',
+      'Advise customer to return item after delivery for a refund.',
+      'Refund processed on receipt of return, minus return shipping (customer fault).'
+    ],
+    templates: ['B11-B'],
+    escalate: 'Customer becomes hostile — escalate to team lead.'
+  },
+  'damaged-major': {
+    title: 'SOP-003 — Damaged item: complete/major damage',
+    steps: [
+      'Send template A2. Ask: (a) What was damaged? (b) Was the entire item damaged or just part? (c) Was the outer box also damaged?',
+      'Box AND product damaged → carrier fault → open carrier claim AND offer resolution.',
+      'Only product damaged, box intact → packing/pre-shipment issue → offer resolution, no carrier claim.',
+      'Assess if item is worth returning: expensive + resellable = return. Cheap or destroyed = no return.',
+      'Resend: create in Linnworks, ship within 1 business day, send tracking via B7.',
+      '⚠ Kitchen, Luggage, or Electronics category → flag to supervisor. These have 3–5× elevated refund rates.'
+    ],
+    templates: ['A2', 'B7'],
+    escalate: 'High-value item or customer requests resolution you cannot authorize.'
+  },
+  'damaged-minor': {
+    title: 'SOP-004 — Damaged item: minor/partial damage',
+    steps: [
+      'Send template A2 to confirm extent of damage.',
+      'Minor cosmetic damage (scratch/dent/chip): offer 10% discount on item price first.',
+      'Customer requests higher discount: consult supervisor before agreeing — do not commit.',
+      'Customer insists on return: issue return label for full refund.',
+      'One item from a set damaged: offer to resend that piece only, not the full set.',
+      'Open carrier claim if the outer box was also damaged.'
+    ],
+    templates: ['A2', 'A3 (if return request already open)'],
+    escalate: 'Customer requests above 10% discount — supervisor approval required first.'
+  },
+  'wrong-item': {
+    title: 'SOP-006 — Wrong item/quantity sent by MSHZ',
+    steps: [
+      'Ask customer: "What item did you receive?" — confirm exactly what they have.',
+      'Confirmed wrong item = seller error. Investigate internally: wrong pick or Linnworks SKU link error? Notify supervisor.',
+      '⚠ FBA ORDER: Do NOT direct customer to Amazon. Warehouse may be mis-linked. Escalate to supervisor BEFORE acting.',
+      'Offer resend or full refund per customer preference.',
+      'Resend: create in Linnworks, ship within 1 business day, send tracking via B7.',
+      'Return requested: provide prepaid label — MSHZ pays all costs (seller fault).'
+    ],
+    templates: ['B7'],
+    escalate: 'FBA wrong item — escalate IMMEDIATELY before contacting customer.'
+  },
+  'not-received-before': {
+    title: 'SOP-008 — In transit, before delivery date',
+    steps: [
+      'Check tracking — confirm item is in transit and on track.',
+      'If in transit and on track: send template B2 with tracking and expected delivery date.',
+      'If tracking shows delivered already: switch to SOP-009 (delivered, not received).'
+    ],
+    templates: ['B2'],
+    escalate: 'Tracking shows no movement for 7+ days — open carrier investigation.'
+  },
+  'not-received-after': {
+    title: 'SOP-009 — Delivered, customer not received',
+    steps: [
+      'Confirm all 4 points: (a) Address correct? (b) Household member received? (c) Post office holding? (d) Neighbor received by mistake?',
+      'Send template B3 — notify customer of delivery confirmation and ask 4 points.',
+      'Open carrier search request SAME DAY as customer inquiry — do not wait.',
+      'Notify customer: "We are investigating — allow 2 business days."',
+      'After 2 business days: carrier locates → new ETA. Cannot locate → offer resend or full refund.',
+      'Customer wants refund → B3-4. Customer wants resend or unspecified → B3-3.'
+    ],
+    templates: ['B3', 'B3-3', 'B3-4'],
+    escalate: 'High-value item — supervisor approval before authorizing resend or refund.'
+  },
+  'delayed': {
+    title: 'SOP-011 — Delayed parcel in transit',
+    steps: [
+      'Assure customer the package has shipped — delay is with the carrier, not MSHZ.',
+      'Open carrier investigation immediately: UPS 1-800-742-5877 / USPS online / Canada Post 1-866-607-6301.',
+      'Send template B3-2. Timeline: "We will follow up within 2 business days."',
+      'If buyer paid for expedited shipping and delivery date has passed: offer refund of the shipping cost paid.',
+      'After investigation: carrier locates → new ETA. Cannot locate → offer resend or full refund.'
+    ],
+    templates: ['B3-2'],
+    escalate: 'Carrier cannot locate after 5 business days — escalate for resolution approval.'
+  },
+  'listing': {
+    title: 'SOP-016 ★ — Listing inaccuracy reported by customer',
+    steps: [
+      'Resolve the customer\'s immediate issue first using the appropriate SOP (refund, resend, etc.).',
+      'Do NOT close the ticket without completing Step 3.',
+      'Submit listing inaccuracy report to the listings team: marketplace + ASIN, customer\'s exact quote, what listing currently shows, order ID.',
+      'Add internal eDesk note: "Listing inaccuracy reported — submitted to listings team on [date]."',
+      'Close ticket ONLY after the report is submitted. Listings team must correct within 48 hours.'
+    ],
+    templates: ['Appropriate resolution template + internal note'],
+    escalate: 'Listings team does not action within 48 hours — escalate to supervisor.'
+  },
+  'technical': {
+    title: 'SOP-015 — Technical/compatibility inquiry (Xtenzi)',
+    steps: [
+      'Ask customer for: (a) exact item and (b) vehicle year/make/model OR device model number.',
+      'Check listing page — compatible models listed? If YES and customer\'s model is listed: confirm.',
+      'If listing has no compatibility info OR you are unsure: use template T2 (model known) or T4 (model unknown).',
+      '⚠ ALL wire harness inquiries: immediately use D3 and assign to Harleen. Never guess compatibility.'
+    ],
+    templates: ['T2', 'T4', 'D3'],
+    escalate: 'Always assign wire harness to Harleen — never attempt to answer independently.'
+  },
+  'discount': {
+    title: 'SOP-014 — Welcome discount (WELCOME15) inquiry',
+    steps: [
+      'Determine why not received: wrong email, not subscribed, or code in spam/junk.',
+      'Wrong email: confirm exact email. If correct, provide WELCOME15 code manually.',
+      'Not subscribed: ask to subscribe. If issues, offer to manually subscribe with their consent.',
+      'Code in spam: ask to check. If not found, provide code manually.',
+      'Order NOT yet placed: provide code WELCOME15 directly.',
+      'Order already placed AND confirmed subscriber: issue 15% partial refund of item price.'
+    ],
+    templates: ['Welcome email / discount code template'],
+    escalate: 'No escalation needed — agent handles independently.'
+  },
+  'address-not-shipped': {
+    title: 'SOP-012 — Address change: item not yet shipped',
+    steps: [
+      'Immediately park the order in Linnworks to prevent processing.',
+      'MINOR changes (add unit/suite, correct spelling, add PO Box): can accommodate.',
+      'MAJOR changes (different postal code, house number, street): CANNOT change. Offer to cancel and reorder.',
+      'Amazon orders: policy does not allow address changes. Offer cancellation.',
+      '⚠ CRITICAL: Do NOT make address changes on flagged or potentially fraudulent Shopify orders.'
+    ],
+    templates: ['B11-A'],
+    escalate: 'Potentially fraudulent Shopify order — escalate immediately, do not ship.'
+  },
+  'address-shipped': {
+    title: 'SOP-013 — Address change: item already shipped',
+    steps: [
+      'Notify customer: address changes cannot be made after dispatch.',
+      'Advise customer to contact the carrier directly with their tracking number to request a redirect.',
+      'Use template B11-B.'
+    ],
+    templates: ['B11-B'],
+    escalate: 'No escalation — informational only.'
+  }
+};
+
+var SUB = {
+  'Cancellation request':       { q:'Has the item already shipped?', yes:'cancel-shipped',       no:'cancel-not-shipped', yL:'Yes — already shipped', nL:'No — not shipped yet' },
+  'Damaged / defective item':   { q:'How severe is the damage?',     yes:'damaged-major',         no:'damaged-minor',      yL:'Complete / major damage', nL:'Minor / partial (scratch, chip, one piece)' },
+  'Wrong item sent':            { q:'Is this an FBA (Amazon-fulfilled) order?', yes:'wrong-item', no:'wrong-item',         yL:'Yes — FBA order', nL:'No — seller fulfilled' },
+  'Item not received':          { q:'Has the expected delivery date already passed?', yes:'not-received-after', no:'not-received-before', yL:'Yes — delivery date passed', nL:'No — still before delivery date' },
+  'Delayed parcel':             { resolve:'delayed' },
+  'Listing inaccuracy':         { resolve:'listing' },
+  'Technical / compatibility':  { resolve:'technical' },
+  'Discount / promotion':       { resolve:'discount' },
+  'Address change':             { q:'Has the item already shipped?', yes:'address-shipped', no:'address-not-shipped', yL:'Yes — already shipped', nL:'No — not shipped yet' }
+};
+
+function resetWizard() {
+  wMkt = ''; wInq = '';
+  renderWizard(0);
+}
+
+function renderWizard(step) {
+  var bar = document.getElementById('w-bar');
+  var title = document.getElementById('w-title');
+  var content = document.getElementById('w-content');
+  if (step === 0) {
+    bar.style.width = '33%';
+    title.textContent = 'Step 1 of 3 — Select marketplace';
+    var opts = ['Amazon USA','Amazon CA','eBay USA','eBay CA','Shopify','Walmart / Other'];
+    content.innerHTML = '<div class="w-q">Which marketplace did this inquiry come from?</div><div class="w-opts">' +
+      opts.map(function(o){ return '<button class="w-opt' + (wMkt===o?' sel':'') + '" onclick="pickMkt(\'' + o + '\')">' + o + '</button>'; }).join('') + '</div>';
+  } else if (step === 1) {
+    bar.style.width = '66%';
+    title.textContent = 'Step 2 of 3 — Select inquiry type';
+    var inqs = ['Cancellation request','Damaged / defective item','Wrong item sent','Item not received','Delayed parcel','Listing inaccuracy','Technical / compatibility','Address change','Discount / promotion'];
+    content.innerHTML = '<div class="w-q">What is the customer contacting you about?</div><div class="w-opts">' +
+      inqs.map(function(o){ return '<button class="w-opt' + (wInq===o?' sel':'') + '" onclick="pickInq(\'' + o + '\')">' + o + '</button>'; }).join('') + '</div>';
+  } else if (step === 2) {
+    bar.style.width = '90%';
+    title.textContent = 'Step 3 of 3 — Clarify the situation';
+    var sub = SUB[wInq];
+    if (!sub) { content.innerHTML = '<div style="color:var(--t3)">No further clarification needed.</div>'; return; }
+    if (sub.resolve) { showResolution(sub.resolve); return; }
+    content.innerHTML = '<div class="w-q">' + sub.q + '</div><div class="w-yesno"><button class="w-opt" onclick="pickSub(\'' + sub.yes + '\')">' + (sub.yL||'Yes') + '</button><button class="w-opt" onclick="pickSub(\'' + sub.no + '\')">' + (sub.nL||'No') + '</button></div>';
+  }
+}
+
+function pickMkt(v) { wMkt = v; renderWizard(1); }
+function pickInq(v) { wInq = v; renderWizard(2); }
+function pickSub(v) { showResolution(v); }
+
+function showResolution(key) {
+  var r = RES[key];
+  if (!r) return;
+  document.getElementById('w-bar').style.width = '100%';
+  document.getElementById('w-title').textContent = 'Resolution — ' + r.title;
+  var steps = r.steps.map(function(s, i) {
+    var warn = s.charAt(0) === '⚠';
+    var cls = warn ? 'sn sn-a' : 'sn sn-b';
+    var txt = warn ? s.replace('⚠ ','') : s;
+    return '<div class="step-r"><div class="' + cls + '">' + (warn ? '!' : (i+1)) + '</div><div class="step-txt">' + txt + '</div></div>';
+  }).join('');
+  var tmpls = r.templates.map(function(t){ return '<button class="tmpl-tag" onclick="jumpToTemplate(\'' + t + '\')">' + t + '</button>'; }).join(' ');
+  document.getElementById('w-content').innerHTML =
+    '<div style="display:flex;flex-direction:column;gap:10px">' +
+    '<div class="res-green"><div class="res-t">' + r.title + '</div>' +
+    (wMkt ? '<div style="font-size:9px;color:var(--t-ok);margin-bottom:6px">Marketplace: ' + wMkt + '</div>' : '') +
+    '<div class="step-list">' + steps + '</div></div>' +
+    '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-size:9px;color:var(--t3);font-weight:700">Templates to use:</span>' + tmpls + '</div>' +
+    '<div class="res-amber"><div class="res-t">Escalate if:</div><div style="font-size:10px;line-height:1.5;color:var(--t-warn)">' + r.escalate + '</div></div>' +
+    '<button class="btn-sm" onclick="resetWizard()" style="width:fit-content;margin-top:4px">← Start new inquiry</button>' +
+    '</div>';
+}
+
+function jumpToTemplate(code) {
+  nav('templates', document.querySelectorAll('.sb-item')[2]);
+  setTimeout(function(){
+    document.querySelectorAll('.tmpl-item').forEach(function(el){
+      if (el.querySelector('.t-code') && el.querySelector('.t-code').textContent.trim() === code.trim()) el.click();
+    });
+  }, 100);
+}
+
+// ═══════════════════════════════════════════════════════════
+// QUICK SEARCH
+// ═══════════════════════════════════════════════════════════
+var SEARCH_IDX = [
+  { k:'damaged broken leak major complete', t:'SOP-003 — Major damaged item', d:'Item arrived completely broken or leaking. Determine carrier vs. pre-shipment fault.', r:'damaged-major' },
+  { k:'scratch chip dent minor partial damage', t:'SOP-004 — Minor damaged item', d:'Scratch, chip, dent, or one item from set damaged. Offer 10% discount first.', r:'damaged-minor' },
+  { k:'wrong item incorrect different quantity', t:'SOP-006 — Wrong item sent', d:'Customer received different item. MSHZ pays all costs — seller fault.', r:'wrong-item' },
+  { k:'not received delivered missing stolen', t:'SOP-009 — Delivered, not received', d:'Tracking shows delivered but customer says not received. Confirm 4 points, open carrier search same day.', r:'not-received-after' },
+  { k:'not received before in transit tracking', t:'SOP-008 — In transit, before delivery date', d:'Item shipped, customer contacting before expected delivery date.', r:'not-received-before' },
+  { k:'delayed delay late carrier weather', t:'SOP-011 — Delayed parcel', d:'Item shipped on time but delayed by carrier. Open investigation, send B3-2.', r:'delayed' },
+  { k:'cancel cancellation not shipped label', t:'SOP-001 — Cancel, item not yet shipped', d:'Customer wants to cancel and item has not shipped yet.', r:'cancel-not-shipped' },
+  { k:'cancel cancellation shipped dispatched', t:'SOP-002 — Cancel, item already shipped', d:'Customer wants to cancel but item already dispatched.', r:'cancel-shipped' },
+  { k:'listing inaccurate description wrong photo quantity misleading', t:'SOP-016 ★ — Listing inaccuracy', d:'Customer says listing was wrong. Mandatory listing report to listings team after resolving customer issue.', r:'listing' },
+  { k:'technical xtenzi wire harness compatibility', t:'SOP-015 — Technical / compatibility', d:'Xtenzi or wire harness compatibility question. Always assign wire harness to Harleen.', r:'technical' },
+  { k:'discount welcome code coupon 15', t:'SOP-014 — Welcome discount WELCOME15', d:'Customer did not receive or cannot use WELCOME15 discount code.', r:'discount' },
+  { k:'address change not shipped', t:'SOP-012 — Address change, not shipped', d:'Customer wants to change address and item not yet dispatched.', r:'address-not-shipped' },
+  { k:'address change shipped dispatched', t:'SOP-013 — Address change, already shipped', d:'Item dispatched — address cannot be changed.', r:'address-shipped' }
+];
+
+function doSearch(v) {
+  var q = v.toLowerCase().trim();
+  var res = document.getElementById('search-results');
+  if (!q) { res.innerHTML = ''; return; }
+  var hits = SEARCH_IDX.filter(function(s){ return s.k.includes(q) || s.t.toLowerCase().includes(q) || s.d.toLowerCase().includes(q); });
+  if (!hits.length) {
+    res.innerHTML = '<div style="font-size:10px;color:var(--t3);padding:8px">No results. Try: damaged, wrong item, not received, cancel, delayed, listing, technical, discount, address.</div>';
+    return;
+  }
+  res.innerHTML = hits.map(function(h){
+    return '<div class="sr-item" onclick="showSearchRes(\'' + h.r + '\')"><div class="sr-title">' + h.t + '</div><div class="sr-desc">' + h.d + '</div></div>';
+  }).join('');
+}
+
+function showSearchRes(key) {
+  document.getElementById('search-results').innerHTML = '<button class="btn-sm" onclick="document.getElementById(\'sop-input\').value=\'\';doSearch(\'\');" style="margin-bottom:8px">← Back to results</button>';
+  var r = RES[key];
+  if (!r) return;
+  var steps = r.steps.map(function(s, i) {
+    var warn = s.charAt(0) === '⚠';
+    return '<div class="step-r"><div class="sn ' + (warn?'sn-a':'sn-b') + '">' + (warn?'!':i+1) + '</div><div class="step-txt">' + (warn?s.replace('⚠ ',''):s) + '</div></div>';
+  }).join('');
+  var tmpls = r.templates.map(function(t){ return '<button class="tmpl-tag">' + t + '</button>'; }).join(' ');
+  var el = document.createElement('div');
+  el.style.cssText = 'display:flex;flex-direction:column;gap:10px';
+  el.innerHTML = '<div class="res-green"><div class="res-t">' + r.title + '</div><div class="step-list">' + steps + '</div></div>' +
+    '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-size:9px;color:var(--t3);font-weight:700">Templates:</span>' + tmpls + '</div>' +
+    '<div class="res-amber"><div class="res-t">Escalate if:</div><div style="font-size:10px;color:var(--t-warn);line-height:1.5">' + r.escalate + '</div></div>';
+  document.getElementById('search-results').appendChild(el);
+}
+
+// ═══════════════════════════════════════════════════════════
+// POLICY DATA & RENDERING
+// ═══════════════════════════════════════════════════════════
+var POLS = [
+  { id:'refund-rules',     cat:'refund',   t:'Refund processing rules',          s:'9 core rules — all marketplaces' },
+  { id:'return-codes',     cat:'refund',   t:'Return reason codes 1–72',         s:'Fault table — seller vs. customer' },
+  { id:'amazon-msg',       cat:'amazon',   t:'Amazon prohibited messaging',      s:'DO NOT violate — suspension risk' },
+  { id:'amazon-health',    cat:'amazon',   t:'Amazon account health thresholds', s:'ODR, OTDR, response time rules' },
+  { id:'carrier-contacts', cat:'carrier',  t:'Carrier contacts & claim steps',   s:'USPS, UPS, Canada Post, Stallion, FedEx' },
+  { id:'return-shipping',  cat:'carrier',  t:'Return shipping cost table',       s:'US estimated costs by weight' },
+  { id:'po-box',           cat:'carrier',  t:'PO Box / parcel locker rules',     s:'Rarely eligible for resend or refund' },
+  { id:'kpi-targets',      cat:'kpi',      t:'KPI targets & current performance',s:'Response time, ODR, feedback benchmarks' },
+  { id:'qa-scorecard',     cat:'kpi',      t:'QA scorecard — 5 dimensions',      s:'Pass = 75/100 · Scoring breakdown' },
+  { id:'cat-alerts',       cat:'kpi',      t:'High-risk product categories',     s:'Kitchen, Luggage, Electronics — elevated refund rates' },
+  { id:'conduct',          cat:'conduct',  t:'Agent conduct principles',         s:'9 non-negotiable rules' },
+  { id:'escalation-rules', cat:'conduct',  t:'Escalation rules',                 s:'When to involve supervisor — ODR context' },
+  { id:'follow-up-cadence',cat:'conduct',  t:'Follow-up cadence policy',         s:'Mandatory schedule — all waiting tickets' },
+  { id:'listing-protocol', cat:'conduct',  t:'Listing inaccuracy protocol',      s:'SOP-016 — mandatory every time' }
+];
+
+var POL_CONTENT = {
+'refund-rules': '<div class="pol-section">Refund processing — 9 core rules</div>' +
+  '<div class="alert-strip" style="margin-bottom:10px">v2 CORRECTION: Return request response is 48 HOURS — not 2 business days. Missing this and having a customer file an A-Z = automatic grant of the claim.</div>' +
+  [['R-1','Return request response: 48 HOURS maximum. If customer files A-Z claim and you have not responded within 48h, Amazon automatically grants the claim and debits MSHZ\'s account.','Applies to: Amazon USA & CA'],
+   ['R-2','Message response: 24 hours — 7 days/week including weekends and holidays. Weekend coverage is in place. Missing this causes metric violations.','Applies to: Amazon USA & CA'],
+   ['R-3','Wrong or damaged item sent by seller: full refund, zero deductions. Cannot deduct original or return shipping when error is MSHZ\'s fault.','Applies to: All marketplaces'],
+   ['R-4','Customer-fault return (accidental order, no longer needed): deduct return shipping cost from refund. Customer pays return shipping.','Applies to: Amazon USA & CA'],
+   ['R-5','Issue refund after return is received — not before, unless returnless refund policy applies.','Applies to: All marketplaces'],
+   ['R-6','Returnless refund: issue immediately, customer keeps the item. Used when return cost exceeds item value.','Applies to: All marketplaces'],
+   ['R-7','Do NOT resend a completely different item. Same item only. Exception: same product line, different variant may be possible with written confirmation.','Applies to: All marketplaces'],
+   ['R-8','Refund must be issued within 2 business days of receiving the return. If not, Amazon may refund automatically and charge MSHZ.','Applies to: Amazon USA & CA'],
+   ['R-9','Resending a different fragrance/variant of same item type: may be accommodated. Must get written confirmation from customer.','Applies to: All marketplaces']
+  ].map(function(r){ return '<div class="rule-row"><div class="rule-num">'+r[0]+'</div><div><div class="rule-text">'+r[1]+'</div><div class="rule-note">'+r[2]+'</div></div></div>'; }).join(''),
+
+'return-codes': '<div class="pol-section">Return reason codes — fault assignment</div>' +
+  '<div class="info-strip" style="margin-bottom:9px">Yellow rows = seller fault (MSHZ pays return shipping). White rows = customer fault (customer pays).</div>' +
+  '<table class="rc-tbl"><thead><tr><th>#</th><th>Reason</th><th>Fault</th><th>Return shipping</th></tr></thead><tbody>' +
+  [[1,'Other reason','C'],[2,'Accidental order','C'],[3,'Better price available','C'],[4,'No reason given','C'],[5,'Incompatible / not useful','C'],[6,'Damaged due to poor packaging','S'],[7,'Arrived too late','S'],[8,'Missing parts or accessories','S'],[9,'Damaged during shipping','S'],[10,'Different from what was ordered','S'],[11,'Defective / does not work','S'],[12,'Arrived in addition to order','S'],[13,"I don't want it anymore",'C'],[14,'Defect emerged after use','S'],[15,'Unauthorized purchase','S'],[16,'I haven\'t received this item','S'],[17,'Item was defective','S'],[18,'Item description inaccurate','S'],[19,'Not satisfied with quality','S'],[20,'Fabric not as expected','S'],[21,'No longer needed/wanted','C'],[22,'Item too large','C'],[23,'Item too small','C'],[28,'Wrong item sent','S'],[32,'Damaged upon arrival','S'],[36,'Ordered wrong style/size/color','C'],[37,'Different from website description','S'],[42,'Dead battery / does not work','S'],[66,'Item is of wrong material','S']].map(function(r){
+    var s = r[2]==='S'; return '<tr class="'+(s?'rc-s':'rc-c')+'"><td>'+r[0]+'</td><td>'+r[1]+'</td><td><span class="pill '+(s?'p-a':'p-gr')+'">'+(s?'Seller':'Customer')+'</span></td><td style="font-size:9px;color:var(--t3)">'+(s?'Seller pays':'Customer pays')+'</td></tr>';
+  }).join('') + '</tbody></table>',
+
+'amazon-msg': '<div class="pol-section">Amazon prohibited messaging — DO NOT VIOLATE</div>' +
+  '<div class="alert-strip" style="margin-bottom:10px">Violations risk account warning, messaging suspension, or immediate account suspension. Every agent must know these rules.</div>' +
+  [['1','Do NOT use "[Important]" in the subject line unless genuinely required to complete an order.','Consequence: account warning / messaging suspension'],
+   ['2','Do NOT send marketing or promotional content in buyer-seller messages.','Consequence: account suspension risk'],
+   ['3 ⚠','Do NOT incentivize, request, or manipulate product reviews in any way. No discounts, refunds, or gifts in exchange for reviews.','Consequence: IMMEDIATE account suspension'],
+   ['4','Do NOT ask for the same review more than once.','Consequence: account warning'],
+   ['5','Do NOT include links or attachments not necessary to complete the order.','Consequence: message blocked / account warning']
+  ].map(function(r){ return '<div class="rule-row"><div class="rule-num" style="'+(r[0].includes('⚠')?'background:var(--bg-err);color:var(--t-err)':'')+'">'+r[0]+'</div><div><div class="rule-text">'+r[1]+'</div><div class="rule-note" style="'+(r[0].includes('⚠')?'color:#a32d2d':'')+'">'+r[2]+'</div></div></div>'; }).join(''),
+
+'amazon-health': '<div class="pol-section">Amazon account health — critical thresholds</div>' +
+  '<div class="alert-strip" style="margin-bottom:10px">Every agent action contributes to or protects these metrics. ODR above 1% = account suspension risk and loss of Buy Box up to 60 days.</div>' +
+  [['ODR','Order Defect Rate must stay BELOW 1% (target: below 0.5% for safety buffer). Calculated over 60 days. Includes: negative feedback, A-Z claims, chargebacks. Breaching 1% = account suspension.','alert'],
+   ['MSG','Message response: above 95% within 24 hours — 7 days/week. Weekend coverage is in place at MSHZ. Late responses cause metric violations.',''],
+   ['RTN','Return request response: 100% within 48 hours — zero exceptions. A-Z filed without your 48h response = Amazon auto-grants the claim.','alert'],
+   ['OTDR','On-Time Delivery Rate must stay ABOVE 90% for seller-fulfilled orders. Below this = Amazon may restrict seller-fulfilled listings.',''],
+   ['BCR','Buyer Contact Rate: currently 2.14% — benchmark is 1.63%. Excess contacts driven by listing errors, wrong items, delivery failures.','warn'],
+   ['BDR','Buyer Dissatisfaction Rate: currently 14.29% — benchmark is 6.47%. Priority action area. Root causes: 28% damaged, 22% not received, 17% listing.','alert']
+  ].map(function(r){ return '<div class="rule-row"><div class="rule-num" style="'+(r[2]==='alert'?'background:var(--bg-err);color:var(--t-err)':r[2]==='warn'?'background:var(--bg-warn);color:var(--t-warn)':'')+'">'+r[0]+'</div><div class="rule-text">'+r[1]+'</div></div>'; }).join(''),
+
+'carrier-contacts': '<div class="pol-section">Carrier contacts</div>' +
+  '<table class="rc-tbl"><thead><tr><th>Carrier</th><th>Region</th><th>Contact</th><th>Min. wait</th></tr></thead><tbody>' +
+  [['USPS','USA','usps.com/help/claims.htm','7 days after mailing'],['UPS','USA & CA','Phone: 1-800-742-5877','5 business days'],['Canada Post','CA','Phone: 1-866-607-6301','5 business days'],['Stallion Express','CA','stallionexpress.ca/support','3 business days'],['ChitChats','CA','chitchats.com','3 business days'],['FedEx','USA','Phone: 1-800-463-3339','5 business days']].map(function(r){ return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td style="font-size:9px">'+r[2]+'</td><td><span class="pill p-a">'+r[3]+'</span></td></tr>'; }).join('') +
+  '</tbody></table>' +
+  '<div class="pol-section" style="margin-top:12px">Claim filing — 6 steps in order</div>' +
+  [['1','Confirm tracking status — screenshot last scan location and date.'],['2','Confirm 4 points with customer before filing: address correct? household member received? post office holding? neighbor received?'],['3','File USPS online (7+ days). Call UPS (1-800-742-5877). Call Canada Post (1-866-607-6301).'],['4','Notify customer same day: "We have opened a carrier investigation and will follow up within 2 business days."'],['5','Follow up with carrier after 2 business days. If located: new ETA. If not: proceed to resend or refund.'],['6','File damage claim separately if item arrived damaged — in addition to any customer resolution.']].map(function(r){ return '<div class="rule-row"><div class="rule-num">'+r[0]+'</div><div class="rule-text">'+r[1]+'</div></div>'; }).join(''),
+
+'return-shipping': '<div class="pol-section">US return shipping cost estimates — seller-fulfilled orders</div>' +
+  '<div class="info-strip" style="margin-bottom:9px">Deduct only for customer-fault returns. Confirm actual label cost when generating — these are estimates.</div>' +
+  '<table class="rc-tbl"><thead><tr><th>Item weight</th><th>Est. cost (USD)</th><th>Carrier</th></tr></thead><tbody>' +
+  [['1 oz – 15 oz','$3.66','USPS'],['15 oz – 1 lb','$4.79','UPS'],['1+ – 2 lbs','$5.11','UPS'],['2+ – 3 lbs','$5.39','UPS'],['3+ – 4 lbs','$5.57','UPS'],['4+ – 5 lbs','$5.69','UPS'],['5+ – 6 lbs','$5.87','UPS'],['6+ – 7 lbs','$6.01','UPS'],['7+ – 8 lbs','$6.22','UPS'],['8+ – 10 lbs','$6.47–$6.79','UPS'],['10+ – 15 lbs','$7.00–$8.12','UPS'],['15+ – 20 lbs','$8.47–$9.64','UPS'],['20+ – 25 lbs','$10.00–$11.39','UPS'],['25+ – 30 lbs','$11.68–$13.03','UPS'],['30+ – 33 lbs','$13.29–$13.99','UPS']].map(function(r){ return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>'; }).join('') + '</tbody></table>',
+
+'po-box': '<div class="pol-section">PO Box / parcel locker — delivery rules</div>' +
+  '<div class="info-strip" style="margin-bottom:9px">Items delivered to PO Boxes and parcel lockers are rarely eligible for resend or refund — they cannot be stolen from these secure locations.</div>' +
+  [['1','Notify customer of delivery using template B3.'],['2','PO Box: ask customer to retrieve from their local post office.'],['3','Amazon Locker: customer has 3 calendar days to collect. After 3 days, item is returned for a refund automatically.'],['4','Other parcel locker: customer contacts the locker service directly — not MSHZ.'],['5','Customer still insists not received: open carrier search request. USPS minimum = 7 days after mailing date.'],['⚠','Resend or refund for PO Box / locker deliveries requires supervisor approval — exceptional cases only.']].map(function(r){ var w=r[0]==='⚠'; return '<div class="rule-row" style="'+(w?'background:var(--bg-warn)':'')+'"><div class="rule-num" style="'+(w?'background:var(--bg-warn);color:var(--t-warn)':'')+'">'+r[0]+'</div><div class="rule-text" style="'+(w?'color:var(--t-warn)':'')+'">'+r[1]+'</div></div>'; }).join(''),
+
+'kpi-targets': '<div class="pol-section">KPI targets vs. current performance (Feb 21 – Mar 21, 2026)</div>' +
+  [['Response time — all messages','Under 24h, 7 days/week','3.09h avg','good'],['Return request response','Within 48h — zero exceptions','Critical policy','alert'],['Order Defect Rate (ODR)','Below 1% (target: 0.5%)','Below 1% — monitor','alert'],['Buyer contact rate','Below 1.63%','Currently 2.14%','warn'],['Buyer dissatisfaction rate','Below 6.47%','Currently 14.29%','alert'],['365-day positive rate','Above 90%','Currently 80%','warn'],['365-day negative rate','Below 5%','Currently 19%','alert'],['Lifetime feedback rating','4.5+ stars','4.8 stars (12,462)','good'],['QA score (monthly)','75/100 to pass','Team avg: 82/100','good']].map(function(r){
+    var c = r[3]==='good'?'p-g':r[3]==='alert'?'p-r':'p-a';
+    return '<div class="rule-row"><div style="flex:1"><div class="rule-text">'+r[0]+'</div><div class="rule-note">Target: '+r[1]+' · Current: '+r[2]+'</div></div><span class="pill '+c+'">'+(r[3]==='good'?'On track':r[3]==='alert'?'Action needed':'Monitor')+'</span></div>';
+  }).join(''),
+
+'qa-scorecard': '<div class="pol-section">QA scorecard — 5 dimensions · Pass = 75/100</div>' +
+  [['Tone & professionalism','Professional, empathetic, customer-focused. Personalized — not copy-pasted.','Sending templates word-for-word. Responding defensively to rude customer.'],['Accuracy','Correct information, correct SOP, correct fault identification, correct return code.','Wrong return code. Wrong fault. Incorrect refund amount communicated.'],['SOP adherence','Correct SOP followed in order. All steps completed. SOP-016 listing report filed where applicable.','Skipping 4-point check. Not opening carrier claim. Not filing listing report.'],['Response time','First response within 24h. Return request within 48h. Follow-ups per cadence (section 09).','Ticket overnight without acknowledgement. Return request not answered in 48h.'],['Resolution quality','Issue fully resolved. Ticket closed with clear notes documenting action taken.','Closing before customer confirms resolution. No notes on ticket.']].map(function(d,i){
+    return '<div class="rule-row"><div class="rule-num">'+(i+1)*20+'</div><div><div class="rule-text" style="font-weight:700">'+d[0]+'</div><div class="rule-note">Evaluated: '+d[1]+'</div><div class="rule-note" style="color:#a32d2d">Common failures: '+d[2]+'</div></div></div>';
+  }).join('') + '<div class="ok-strip" style="margin-top:9px">Score interpretation: 75–100 = pass · 60–74 = coaching plan · Below 60 = formal improvement plan required</div>',
+
+'cat-alerts': '<div class="pol-section">High-risk product categories — elevated refund rates</div>' +
+  '<div class="info-strip" style="margin-bottom:9px">These categories have refund rates 2–5× the overall account average (0.059%). Apply extra scrutiny and flag patterns to supervisor.</div>' +
+  [['Kitchen','0.30%','5× average','HIGH','Fragile items — breakage in transit. Always ask if box was also damaged (carrier claim needed).'],['Tools','0.20%','3× average','HIGH','Compatibility issues — customer purchased wrong spec. Ask compatibility questions before resolving.'],['Luggage','0.20%','3× average','HIGH','Damage in transit — large items hard to pack. Flag multiple damage reports in same week to supervisor.'],['Electronics','0.17%','3× average','HIGH','Wrong specs — port type mismatch confirmed in your data. Check listing accuracy on every Electronics return.'],['Home','0.14%','2× average','MEDIUM','Mix of fragile items and description issues. Ask if damage was pre-shipment or in-transit.'],['PC / Computers','0.14%','2× average','MEDIUM','Compatibility and spec mismatch. Assign to Harleen for technical assessment.'],['Beauty','0.10%','1.7× average','MEDIUM','Packaging damage — leaking bottles. Ask if leaked before or after opening.']].map(function(r){
+    return '<div class="rule-row"><div style="flex:1"><div class="rule-text" style="font-weight:700">'+r[0]+' <span style="font-size:9px;font-weight:400;color:var(--t3)">'+r[1]+' refund rate — '+r[2]+'</span></div><div class="rule-note">'+r[4]+'</div></div><span class="pill '+(r[3]==='HIGH'?'p-r':'p-a')+'">'+r[3]+'</span></div>';
+  }).join(''),
+
+'conduct': '<div class="pol-section">9 core agent conduct principles — non-negotiable</div>' +
+  [['1','Get organized — track all conversations in eDesk, document every action taken before closing.'],['2','Read the entire thread before replying — every single time, without exception.'],['3','Every reply must move the ticket forward — no filler messages or acknowledgements without action.'],['4','Personalize every interaction — customer name, order ID, their specific situation.'],['5','Response time: 24 hours or less — 7 days a week including weekends and holidays. Weekend coverage is in place.'],['6','Do not take hostile customers personally — stay professional, escalate to team lead if needed.'],['7','Underpromise, overdeliver — never give delivery estimate without confirming with warehouse.'],['8','The customer is always right — work toward resolution even if customer is factually incorrect.'],['9','Document every action before closing — leave a clear note summarizing what was done and why.']].map(function(r){ return '<div class="rule-row"><div class="rule-num">'+r[0]+'</div><div class="rule-text">'+r[1]+'</div></div>'; }).join(''),
+
+'escalation-rules': '<div class="pol-section">Escalation rules — when to involve supervisor</div>' +
+  '<div class="alert-strip" style="margin-bottom:9px">A-Z claims count directly against ODR. Supervisors must be notified within 1 hour of any A-Z claim.</div>' +
+  [['Listing inaccuracy reported by customer','Resolve customer issue first. Then submit listing inaccuracy report to listings team same day before closing ticket.','Same day','Yes — listing errors drive returns and ODR'],['Refund dispute above $40','Do not process independently. Escalate for review before communicating outcome to customer.','Same day','Yes — disputes become A-Z claims'],['FBA wrong item received','STOP. Do not direct customer to Amazon. Warehouse may be mis-linked. Escalate before acting.','Immediately','Yes — repeat wrong shipments compound ODR'],['Customer hostile or threatening','Disengage professionally, note in eDesk, escalate.','Same day','Low'],['A-Z claim filed','Notify supervisor immediately. Respond to return request within 48h and claim within 3 calendar days.','Within 1 hour','HIGH — directly counts against ODR'],['Technical / Xtenzi inquiry','Assign to Harleen via eDesk tag. Never attempt to answer technical specs independently.','Same day','Low']].map(function(r){
+    return '<div class="rule-row"><div style="flex:1"><div class="rule-text" style="font-weight:700">'+r[0]+'</div><div class="rule-note">'+r[1]+'</div><div class="rule-note">Contact: supervisor · Timing: '+r[2]+'</div></div><span class="pill '+(r[3].includes('HIGH')||r[3].startsWith('Yes')?'p-r':'p-gr')+'">'+(r[3].includes('HIGH')?'HIGH ODR risk':r[3].startsWith('Yes')?'ODR risk':'Low risk')+'</span></div>';
+  }).join(''),
+
+'follow-up-cadence': '<div class="pol-section">Mandatory follow-up cadence — all waiting tickets</div>' +
+  '<div class="info-strip" style="margin-bottom:9px">This policy was created because at least 2 customers in your 2025–2026 data never received follow-up, leading to A-Z claims and negative reviews.</div>' +
+  [['Day 0','Send initial response. Move ticket to eDesk Waiting tab. Add date note: "Follow up if no reply by [DATE]."'],['Day 1','No action — allow customer one full business day to reply.'],['Day 2','Send first follow-up. Reference the original issue. Ask if they need clarification or issue is resolved.'],['Day 3','Send second and final follow-up. Warn: "If we do not hear from you by [date] we will close this ticket."'],['No reply','Close ticket using template D6 (Inactive Ticket). Add internal note. Mark as INACTIVE — NOT as Solved.']].map(function(r,i){
+    var c = i===0?'p-b':i<2?'p-gr':i===4?'p-r':'p-a';
+    return '<div class="rule-row"><span class="pill '+c+'" style="min-width:52px;justify-content:center;flex-shrink:0">'+r[0]+'</span><div class="rule-text">'+r[1]+'</div></div>';
+  }).join('') +
+  '<div class="pol-section" style="margin-top:12px">Escalation timelines</div>' +
+  [['Customer no reply after 3 follow-ups','Day 3','Close with D6'],['Carrier no response to investigation','5 business days','Escalate to supervisor'],['Supervisor no response to escalation','2 business days','Escalate to team lead'],['Listings team — standard correction','3 business days','Escalate to supervisor'],['Listings team — return codes 18 or 37','2 business days','Escalate to supervisor (higher urgency)'],['Resend not shipped','1 business day after authorization','Shipping team + supervisor'],['A-Z claim — no action','Same day within 1 hour','Supervisor immediately']].map(function(r){ return '<div class="rule-row"><div style="flex:1"><div class="rule-text">'+r[0]+'</div><div class="rule-note">Trigger after: '+r[1]+' · Action: '+r[2]+'</div></div></div>'; }).join(''),
+
+'listing-protocol': '<div class="pol-section">Listing inaccuracy escalation protocol — SOP-016</div>' +
+  '<div class="alert-strip" style="margin-bottom:9px">17% of your negative reviews are caused by listing inaccuracies. Every uncorrected listing generates repeat incidents from future customers.</div>' +
+  [['1','Resolve the customer\'s immediate issue first using the appropriate SOP. Do not skip to the listing report.'],['2','Submit listing inaccuracy report to the listings team. Include: marketplace + ASIN/URL, exact customer quote, what listing currently shows, order ID.'],['3','Add internal eDesk note before closing: "Listing inaccuracy reported — submitted to listings team on [date]."'],['4','Close ticket ONLY after the report is submitted. This step is mandatory every single time — never skip it.'],['5','Listings team corrects within 48 hours (standard). For return codes 18 or 37: priority — 24 hours.'],['⚠','Agent also reports proactively if they notice a listing issue while handling any other inquiry — even if no customer has complained yet.']].map(function(r){ var w=r[0]==='⚠'; return '<div class="rule-row"><div class="rule-num" style="'+(w?'background:var(--bg-warn);color:var(--t-warn)':'')+'">'+r[0]+'</div><div class="rule-text" style="'+(w?'color:var(--t-warn);font-weight:700':'')+'">'+r[1]+'</div></div>'; }).join('')
+};
+
+var polCatFilter = 'all';
+function buildPolList(cat, q) {
+  cat = cat || polCatFilter; q = (q||'').toLowerCase();
+  var list = document.getElementById('pol-list');
+  var items = POLS.filter(function(p){ return (cat==='all'||p.cat===cat) && (!q || p.t.toLowerCase().includes(q) || p.s.toLowerCase().includes(q)); });
+  list.innerHTML = items.map(function(p){ return '<div class="pol-item" id="pi-'+p.id+'" onclick="selectPol(\''+p.id+'\')"><div class="pol-item-t">'+p.t+'</div><div class="pol-item-s">'+p.s+'</div></div>'; }).join('');
+  if (items.length) selectPol(items[0].id);
+}
+function selectPol(id) {
+  document.querySelectorAll('.pol-item').forEach(function(el){ el.classList.remove('sel'); });
+  var el = document.getElementById('pi-'+id); if (el) el.classList.add('sel');
+  document.getElementById('pol-detail').innerHTML = POL_CONTENT[id] || '<div style="color:var(--t3)">Coming soon.</div>';
+}
+function filterPolCat(cat, el) {
+  polCatFilter = cat;
+  document.querySelectorAll('#p-policy .chip').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on');
+  buildPolList(cat, document.getElementById('pol-search-input').value);
+}
+function filterPolicies(v) { buildPolList(polCatFilter, v); }
+
+// ═══════════════════════════════════════════════════════════
+// TEMPLATE DATA & RENDERING
+// ═══════════════════════════════════════════════════════════
+var TMPLS = [
+  { code:'A2', series:'a', name:'Received damaged or defective item', when:'Customer reports damage — NO return request opened yet. Use before A3.', sop:'SOP-003, SOP-004, SOP-005', vars:['customer_name','order_id','item_name'], donot:'Return request already open — use A3 instead.',
+    body:'Hi {{customer_name}},\n\nWe\'re sorry to hear your order arrived in less than perfect condition. We want to make this right as quickly as possible.\n\nCould you help us with a few quick questions?\n1. What exactly was damaged?\n2. Was the entire item damaged, or just part of it?\n3. Was the outer box also damaged, or only the product inside?\n\nThis helps us find the best resolution for you.\n\nThank you for your patience,\nMSHZ Customer Service' },
+  { code:'A3', series:'a', name:'Received damaged/defective (return request open)', when:'Damage reported AND a return request has already been opened on the marketplace.', sop:'SOP-003, SOP-004', vars:['customer_name','order_id','item_name','return_id'], donot:'No return request open — use A2 instead.',
+    body:'Hi {{customer_name}},\n\nThank you for reaching out. We can see you have opened a return request for order {{order_id}} regarding {{item_name}}.\n\nWe are reviewing your request now. Could you let us know:\n1. What was damaged or defective?\n2. Would you prefer a replacement or a full refund?\n\nWe will process your request as quickly as possible.\n\nMSHZ Customer Service' },
+  { code:'B2', series:'b', name:"Where's my item (before delivery date)", when:'Customer contacts before expected delivery date. Item still in transit and on track.', sop:'SOP-008', vars:['customer_name','order_id','tracking_number','expected_delivery_date','carrier'], donot:'Delivery date already passed — use B3 instead.',
+    body:'Hi {{customer_name}},\n\nThank you for reaching out about order {{order_id}}.\n\nYour order is on its way!\nCarrier: {{carrier}}\nTracking number: {{tracking_number}}\nExpected delivery: {{expected_delivery_date}}\n\nPlease allow until the expected delivery date. If the item has not arrived by then, please let us know and we will investigate right away.\n\nMSHZ Customer Service' },
+  { code:'B3', series:'b', name:"Where's my item (delivered, not received)", when:'Tracking shows delivered but customer says they did not receive it.', sop:'SOP-009', vars:['customer_name','order_id','tracking_number','delivery_date','delivery_address'], donot:'Item still in transit — use B2 instead.',
+    body:'Hi {{customer_name}},\n\nThank you for reaching out about order {{order_id}}.\n\nOur records show this order was delivered on {{delivery_date}} to {{delivery_address}}.\n\nBefore we proceed, could you please confirm:\n1. Is the address above correct and without spelling errors?\n2. Has anyone else in your household received the package?\n3. Is your local post office possibly holding the package?\n4. Could a neighbor have received the delivery by mistake?\n\nPlease let us know and we will follow up immediately.\n\nMSHZ Customer Service' },
+  { code:'B3-2', series:'b', name:"Where's my item — carrier delay", when:'Item shipped on time but delayed by carrier (weather, facility, peak season).', sop:'SOP-011', vars:['customer_name','order_id','tracking_number','carrier','original_delivery_date'], donot:'Item completely lost — use B3-3 or B3-4 instead.',
+    body:'Hi {{customer_name}},\n\nThank you for your patience regarding order {{order_id}}.\n\nYour order is in transit with {{carrier}} (tracking: {{tracking_number}}). Delivery was expected by {{original_delivery_date}}.\n\nWe have opened an investigation with the carrier and will follow up within 2 business days.\n\nWe sincerely apologize for the inconvenience.\n\nMSHZ Customer Service' },
+  { code:'B3-3', series:'b', name:'Delivered, not received — 4 points confirmed (resend)', when:'Customer confirmed all 4 points, not received, wants resend or has not specified.', sop:'SOP-009', vars:['customer_name','order_id','carrier_case_number'], donot:'Customer explicitly wants refund — use B3-4.',
+    body:'Hi {{customer_name}},\n\nThank you for confirming those details for order {{order_id}}.\n\nWe have opened a search request with the carrier (case: {{carrier_case_number}}) and are actively investigating.\n\nWe will follow up within 2 business days. If the carrier is unable to locate your package, we will arrange a replacement shipment at no cost.\n\nThank you for your patience,\nMSHZ Customer Service' },
+  { code:'B3-4', series:'b', name:'Delivered, not received — 4 points confirmed (refund)', when:'Customer confirmed all 4 points, not received, explicitly wants a refund.', sop:'SOP-009', vars:['customer_name','order_id','carrier_case_number','refund_amount'], donot:'Customer wants resend — use B3-3.',
+    body:'Hi {{customer_name}},\n\nThank you for confirming those details for order {{order_id}}.\n\nWe have opened a carrier investigation (case: {{carrier_case_number}}). As you have requested a refund, we will process a full refund of {{refund_amount}} once the investigation is concluded, or within 2 business days if the carrier cannot locate the package.\n\nWe apologize for this experience.\n\nMSHZ Customer Service' },
+  { code:'B7', series:'b', name:'Resend confirmation', when:'Resend has been created in Linnworks and has shipped. Use to send new tracking to customer.', sop:'SOP-003, SOP-006, SOP-009', vars:['customer_name','order_id','new_tracking_number','carrier','estimated_delivery_date'], donot:'Resend has not yet shipped — do not send until tracking is confirmed.',
+    body:'Hi {{customer_name}},\n\nGreat news! We have shipped a replacement for your order {{order_id}}.\n\nYour new tracking details:\nCarrier: {{carrier}}\nTracking number: {{new_tracking_number}}\nEstimated delivery: {{estimated_delivery_date}}\n\nPlease don\'t hesitate to reach out if you have any further questions.\n\nMSHZ Customer Service' },
+  { code:'B11-A', series:'b', name:'Address change — major change, not shipped', when:'Customer requests major address change (postal code, street, house number) and item not shipped.', sop:'SOP-012', vars:['customer_name','order_id','original_address'], donot:'Minor change (unit number, spelling) — accommodate directly.',
+    body:'Hi {{customer_name}},\n\nThank you for reaching out about order {{order_id}}.\n\nUnfortunately, we are unable to make changes to the shipping address once an order has been placed, as per marketplace policy. Your current address on file is: {{original_address}}.\n\nWe have two options:\n1. We can cancel the order so you can re-place it with the correct address.\n2. If you are able to retrieve the package at the original address, we can proceed with shipping.\n\nPlease let us know how you would like to proceed.\n\nMSHZ Customer Service' },
+  { code:'B11-B', series:'b', name:'Address change — item already shipped', when:'Customer requests address change after dispatch.', sop:'SOP-013', vars:['customer_name','order_id','carrier','tracking_number'], donot:'Item not yet shipped — use B11-A.',
+    body:'Hi {{customer_name}},\n\nThank you for reaching out about order {{order_id}}.\n\nUnfortunately, once an order has been dispatched, we are unable to make changes to the shipping address from our end.\n\nYour order is currently with {{carrier}} (tracking: {{tracking_number}}). We recommend contacting {{carrier}} directly with your tracking number to request an address redirect.\n\nWe apologize for the inconvenience.\n\nMSHZ Customer Service' },
+  { code:'C8', series:'c', name:'Negative feedback — problem not specified', when:'Negative seller feedback received and the reason is unclear or not detailed.', sop:'Feedback handling section 06', vars:['customer_name','order_id'], donot:'Reason is clear — use a specific resolution template and SOP instead.',
+    body:'Hi {{customer_name}},\n\nThank you for taking the time to leave feedback about your order {{order_id}}. We are sorry to hear you were not completely satisfied.\n\nWe would love the opportunity to make this right. Could you please share more details about your experience so we can understand what happened and find the best resolution?\n\nMSHZ Customer Service' },
+  { code:'D3', series:'d', name:'Consult tech team (Xtenzi / wire harness)', when:'Technical compatibility question that cannot be answered from the listing page alone.', sop:'SOP-015', vars:['customer_name','order_id','item_name'], donot:'Answer is clearly stated on the listing page — answer directly.',
+    body:'Hi {{customer_name}},\n\nThank you for your question regarding {{item_name}} (order {{order_id}}).\n\nWe want to ensure we give you the most accurate answer possible. Our technical team is reviewing your compatibility inquiry and will follow up within 24 hours.\n\nWe appreciate your patience!\n\nMSHZ Customer Service' },
+  { code:'D6', series:'d', name:'Inactive ticket close', when:'Customer has not replied after 3 consecutive follow-up messages over 3 business days.', sop:'Follow-up cadence section 09', vars:['customer_name','order_id'], donot:'Customer replied at any point — never close an active conversation.',
+    body:'Hi {{customer_name}},\n\nWe have reached out a few times regarding your order {{order_id}} but have not heard back from you.\n\nWe will be closing this inquiry for now, but please don\'t hesitate to reach out again if you still need assistance. We are always here to help.\n\nMSHZ Customer Service' },
+  { code:'T2', series:'t', name:'Xtenzi — compatible? (model number known)', when:'Customer has provided vehicle make/model/year or device model number.', sop:'SOP-015', vars:['customer_name','order_id','item_name','customer_model'], donot:'Model number not yet provided — use T4 first.',
+    body:'Hi {{customer_name}},\n\nThank you for providing your model details for {{item_name}} (order {{order_id}}).\n\nWe have checked compatibility for {{customer_model}} and [CONFIRM COMPATIBILITY RESULT HERE before sending].\n\nPlease let us know if you have any additional questions.\n\nMSHZ Customer Service' },
+  { code:'T4', series:'t', name:'Xtenzi — compatible? (model number unknown)', when:'Customer asking about compatibility but has NOT provided vehicle or device model number.', sop:'SOP-015', vars:['customer_name','order_id','item_name'], donot:'Customer already provided model number — use T2 instead.',
+    body:'Hi {{customer_name}},\n\nThank you for your question about {{item_name}} (order {{order_id}}).\n\nTo confirm compatibility, could you please provide:\n1. Your vehicle year, make, and model (e.g., 2019 Toyota Camry)\n   OR\n2. Your device model number\n\nOnce we have this information, our team will confirm compatibility as quickly as possible.\n\nMSHZ Customer Service' }
+];
+
+var tmplSeries = 'all', tmplQ = '';
+function buildTmplList() {
+  var items = TMPLS.filter(function(t){ return (tmplSeries==='all'||t.series===tmplSeries) && (!tmplQ || t.name.toLowerCase().includes(tmplQ) || t.code.toLowerCase().includes(tmplQ) || t.when.toLowerCase().includes(tmplQ)); });
+  document.getElementById('tmpl-list').innerHTML = items.map(function(t){
+    return '<div class="tmpl-item" id="ti-'+t.code+'" onclick="selectTmpl(\''+t.code+'\')"><div class="t-code">'+t.code+'</div><div><div class="t-name">'+t.name+'</div><div class="t-when">'+t.when.substring(0,55)+'...</div></div></div>';
+  }).join('');
+  if (items.length) selectTmpl(items[0].code);
+}
+function selectTmpl(code) {
+  document.querySelectorAll('.tmpl-item').forEach(function(el){ el.classList.remove('sel'); });
+  var el = document.getElementById('ti-'+code); if (el) el.classList.add('sel');
+  var t = TMPLS.find(function(x){ return x.code===code; });
+  if (!t) return;
+  var vars = t.vars.map(function(v){ return '<span class="var-chip">{{'+v+'}}</span>'; }).join(' ');
+  document.getElementById('tmpl-pane').innerHTML =
+    '<div><div style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:3px">'+t.code+' — '+t.name+'</div>' +
+    '<div style="font-size:10px;color:var(--t3)">SOP reference: '+t.sop+'</div></div>' +
+    '<div class="form-field"><div class="form-lbl">When to use</div><div style="font-size:11px;color:var(--t1);line-height:1.6">'+t.when+'</div></div>' +
+    '<div class="alert-strip"><strong>Do NOT use if:</strong> '+t.donot+'</div>' +
+    '<div class="form-field"><div class="form-lbl">Required variables — fill in before sending</div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">'+vars+'</div></div>' +
+    '<div class="form-field"><div class="form-lbl">Template preview</div><div class="preview-body">'+t.body+'</div></div>' +
+    '<div style="display:flex;gap:8px"><button class="btn-primary" onclick="copyTmpl(\''+code+'\')">Copy template</button><button onclick="nav(\'decision\',document.querySelectorAll(\'.sb-item\')[0])">Use in Decision Engine</button></div>';
+}
+function filterTSeries(s, el) {
+  tmplSeries = s;
+  document.querySelectorAll('#p-templates .chip').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on'); buildTmplList();
+}
+function filterTemplates(v) { tmplQ = v.toLowerCase(); buildTmplList(); }
+function copyTmpl(code) {
+  var t = TMPLS.find(function(x){ return x.code===code; });
+  if (t && navigator.clipboard) navigator.clipboard.writeText(t.body).then(function(){ alert('Template '+code+' copied to clipboard!'); });
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+resetWizard();
+buildPolList('all');
+buildTmplList();
+</script>
+</body>
+</html>
