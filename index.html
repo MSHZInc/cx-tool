@@ -712,9 +712,26 @@ input:focus, select:focus, textarea:focus { outline:none; border-color:var(--blu
 function nav(id, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
-  document.getElementById('p-' + id).classList.add('active');
-  el.classList.add('active');
-  const T = { decision:'Decision Engine', policy:'Policy Dashboard', templates:'Template Library', shifts:'Shift Schedule', kpi:'Agent KPI Dashboard' };
+  // Also reset admin sidebar item style (it uses inline styles not class)
+  var adminEl = document.getElementById('sb-admin');
+  if (adminEl) {
+    adminEl.style.background = '';
+    adminEl.style.color = '';
+    adminEl.style.borderLeft = '2px solid transparent';
+    adminEl.style.fontWeight = '';
+  }
+  var page = document.getElementById('p-' + id);
+  if (!page) { console.error('Page not found: p-' + id); return; }
+  page.classList.add('active');
+  if (el && el.classList) el.classList.add('active');
+  // Highlight admin item separately
+  if (id === 'admin' && adminEl) {
+    adminEl.style.background = '#E6F1FB';
+    adminEl.style.color = '#0C447C';
+    adminEl.style.borderLeft = '2px solid #378ADD';
+    adminEl.style.fontWeight = '600';
+  }
+  const T = { decision:'Decision Engine', policy:'Policy Dashboard', templates:'Template Library', shifts:'Shift Schedule', kpi:'Agent KPI Dashboard', admin:'Admin Panel' };
   document.getElementById('topbar-title').textContent = T[id] || id;
 }
 
