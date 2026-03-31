@@ -1486,7 +1486,7 @@ function saveSection(section) {
   indicator.style.background = '#F1EFE8';
   indicator.style.color = '#444441';
 
-  if (SCRIPT_URL === https://script.google.com/a/macros/mshzinc.com/s/AKfycbwiITHkEiflDIajMIsLcb1pnHmJHlcmv9_13ZgzsVD6BDMyCFoHtwVDDZlJwCu6Bptf/exec) {
+  if (SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
     // Local only — data is in memory, will reset on reload
     setTimeout(function(){
       indicator.textContent = 'Saved locally (connect Google Sheets to persist)';
@@ -1524,7 +1524,7 @@ function saveSection(section) {
 function checkAdminSheetStatus() {
   var badge = document.getElementById('admin-sheet-badge');
   var notice = document.getElementById('admin-offline-notice');
-  if (SCRIPT_URL === https://script.google.com/a/macros/mshzinc.com/s/AKfycbwiITHkEiflDIajMIsLcb1pnHmJHlcmv9_13ZgzsVD6BDMyCFoHtwVDDZlJwCu6Bptf/exec) {
+  if (SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
     badge.textContent = 'Not connected — changes are local only';
     badge.style.background = '#FAEEDA'; badge.style.color = '#633806';
     notice.style.display = 'block';
@@ -1545,7 +1545,7 @@ function escHtml(str) {
 // GOOGLE SHEETS LIVE SHIFT INTEGRATION
 // ═══════════════════════════════════════════════════════════
 // STEP 1: Paste your Google Apps Script Web App URL below
-var SCRIPT_URL = https://script.google.com/a/macros/mshzinc.com/s/AKfycbwiITHkEiflDIajMIsLcb1pnHmJHlcmv9_13ZgzsVD6BDMyCFoHtwVDDZlJwCu6Bptf/exec;
+var SCRIPT_URL = 'https://script.google.com/a/macros/mshzinc.com/s/AKfycbwiITHkEiflDIajMIsLcb1pnHmJHlcmv9_13ZgzsVD6BDMyCFoHtwVDDZlJwCu6Bptf/exec';
 
 // Scheduled times (EST) for status calculation
 var SCHEDULES = {
@@ -1626,7 +1626,7 @@ function updateCard(agent, row) {
 }
 
 function loadShiftData() {
-  if (SCRIPT_URL === https://script.google.com/a/macros/mshzinc.com/s/AKfycbwiITHkEiflDIajMIsLcb1pnHmJHlcmv9_13ZgzsVD6BDMyCFoHtwVDDZlJwCu6Bptf/exec) {
+  if (SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
     document.getElementById('sheet-status').textContent = 'Set up Google Sheets to go live';
     document.getElementById('sheet-status').style.color = '#854f0b';
     // Show placeholder dashes
@@ -1668,7 +1668,7 @@ function submitCheckin() {
   var h12 = h % 12 || 12;
   var timeStr = h12 + ':' + m + ' ' + ampm;
 
-  if (SCRIPT_URL === https://script.google.com/a/macros/mshzinc.com/s/AKfycbwiITHkEiflDIajMIsLcb1pnHmJHlcmv9_13ZgzsVD6BDMyCFoHtwVDDZlJwCu6Bptf/exec) {
+  if (SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
     // Demo mode — update UI locally without saving
     var row = {
       checkin: action === 'Check In' ? timeStr : document.getElementById('checkin-' + agent).textContent,
