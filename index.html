@@ -267,6 +267,11 @@ input:focus, select:focus, textarea:focus { outline:none; border-color:var(--blu
     <svg class="sb-icon" viewBox="0 0 16 16"><polyline points="2,12 5,7 8,9 11,4 14,6"/></svg>
     Agent KPIs
   </div>
+  <div style="padding:10px 15px 3px;font-size:9px;font-weight:700;color:#888780;text-transform:uppercase;letter-spacing:.07em;margin-top:6px">Owner</div>
+  <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:11px;color:#595958;cursor:pointer;border-left:2px solid transparent" id="sb-admin" onclick="nav('admin',this)" onmouseover="this.style.background='#f8f8f6'" onmouseout="this.style.background=''">
+    <svg style="width:13px;height:13px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.6" viewBox="0 0 16 16"><rect x="4" y="7" width="8" height="7" rx="1"/><path d="M6 7V5a2 2 0 014 0v2"/></svg>Admin
+    <span style="margin-left:auto;font-size:9px;background:#FAEEDA;color:#633806;padding:1px 6px;border-radius:8px;font-weight:700">PIN</span>
+  </div>
 </div>
 
 <!-- ══ MAIN ═══════════════════════════════════════════════ -->
@@ -370,80 +375,137 @@ input:focus, select:focus, textarea:focus { outline:none; border-color:var(--blu
        ══════════════════════════════════════════════════════ -->
   <div class="page" id="p-shifts">
     <div class="g4">
-      <div class="kc"><div class="kl">Agents active today</div><div class="kv">3</div><div class="ks ks-g">All checked in</div></div>
-      <div class="kc"><div class="kl">Weekend coverage</div><div class="kv">Active</div><div class="ks ks-g">Amazon 24h SLA met</div></div>
-      <div class="kc"><div class="kl">Open follow-ups</div><div class="kv">3</div><div class="ks ks-a">Due today (cadence)</div></div>
-      <div class="kc"><div class="kl">Next shift</div><div class="kv">9:00</div><div class="ks">Tomorrow — all 3</div></div>
+      <div class="kc"><div class="kl">Agents active today</div><div class="kv" id="active-count">2</div><div class="ks ks-g">Kimberly + Jobelle</div></div>
+      <div class="kc"><div class="kl">Weekend coverage</div><div class="kv">Yes</div><div class="ks ks-g">Amazon 24h SLA met</div></div>
+      <div class="kc"><div class="kl">Follow-ups due</div><div class="kv">3</div><div class="ks ks-a">Action today</div></div>
+      <div class="kc"><div class="kl">Shifts today</div><div class="kv">2</div><div class="ks">AM + PM coverage</div></div>
     </div>
     <div class="g2">
-      <div style="display:flex;flex-direction:column;gap:13px">
-        <div class="g3">
-          <div class="shift-card">
-            <div class="sc-head"><div class="av av-k">KR</div><div><div class="sc-name">Kimberly R.</div><div class="sc-role">Senior Agent · AMZ USA/CA · eBay</div></div><span class="pill p-g" style="margin-left:auto">On shift</span></div>
-            <div class="sc-row"><span class="sc-lbl">Check-in</span><span class="sc-val">9:02 AM</span></div>
-            <div class="sc-row"><span class="sc-lbl">Scheduled out</span><span class="sc-val">5:00 PM</span></div>
-            <div class="sc-row"><span class="sc-lbl">Break</span><span class="sc-val">30 min</span></div>
-            <div class="sc-row"><span class="sc-lbl">Tickets today</span><span class="sc-val" style="color:#3b6d11">47</span></div>
-            <div class="tt"><div class="tt-fill" style="width:72%"></div></div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <!-- LIVE AGENT CARDS -->
+        <div class="g2">
+          <div class="shift-card" id="card-KR">
+            <div class="sc-head">
+              <div class="av av-k">KR</div>
+              <div style="flex:1"><div class="sc-name">Kimberly R.</div><div class="sc-role">Senior Agent · AMZ USA/CA · eBay · Shopify</div></div>
+              <span class="pill" id="badge-KR" style="margin-left:auto;background:#F1EFE8;color:#444441">Loading...</span>
+            </div>
+            <div class="sc-row"><span class="sc-lbl">Shift</span><span class="sc-val">8:30 AM – 12:30 PM EST</span></div>
+            <div class="sc-row"><span class="sc-lbl">Check-in</span><span class="sc-val" id="checkin-KR">—</span></div>
+            <div class="sc-row"><span class="sc-lbl">Check-out</span><span class="sc-val" id="checkout-KR">—</span></div>
+            <div class="sc-row"><span class="sc-lbl">Tickets today</span><span class="sc-val" id="tickets-KR">—</span></div>
+            <div class="sc-row"><span class="sc-lbl">Last updated</span><span class="sc-val" id="updated-KR" style="font-size:9px;color:var(--t3)">—</span></div>
+            <div class="tt"><div class="tt-fill" id="bar-KR" style="width:0%"></div></div>
           </div>
-          <div class="shift-card">
-            <div class="sc-head"><div class="av av-j">JC</div><div><div class="sc-name">Jobelle C.</div><div class="sc-role">Agent · AMZ CA · eBay · Walmart</div></div><span class="pill p-a" style="margin-left:auto">Late</span></div>
-            <div class="sc-row"><span class="sc-lbl">Check-in</span><span class="sc-val" style="color:#854f0b">9:15 AM (+15)</span></div>
-            <div class="sc-row"><span class="sc-lbl">Scheduled out</span><span class="sc-val">5:00 PM</span></div>
-            <div class="sc-row"><span class="sc-lbl">Break</span><span class="sc-val">30 min</span></div>
-            <div class="sc-row"><span class="sc-lbl">Tickets today</span><span class="sc-val">33</span></div>
-            <div class="tt"><div class="tt-fill" style="width:59%"></div></div>
-          </div>
-          <div class="shift-card">
-            <div class="sc-head"><div class="av av-h">HS</div><div><div class="sc-name">Harleen S.</div><div class="sc-role">Team Lead · Tech · All channels</div></div><span class="pill p-g" style="margin-left:auto">On shift</span></div>
-            <div class="sc-row"><span class="sc-lbl">Check-in</span><span class="sc-val">8:55 AM</span></div>
-            <div class="sc-row"><span class="sc-lbl">Scheduled out</span><span class="sc-val">5:10 PM</span></div>
-            <div class="sc-row"><span class="sc-lbl">Break</span><span class="sc-val">30 min</span></div>
-            <div class="sc-row"><span class="sc-lbl">Tickets today</span><span class="sc-val">21</span></div>
-            <div class="tt"><div class="tt-fill" style="width:38%"></div></div>
+          <div class="shift-card" id="card-JC">
+            <div class="sc-head">
+              <div class="av av-j">JC</div>
+              <div style="flex:1"><div class="sc-name">Jobelle C.</div><div class="sc-role">Agent · AMZ CA · eBay · Walmart</div></div>
+              <span class="pill" id="badge-JC" style="margin-left:auto;background:#F1EFE8;color:#444441">Loading...</span>
+            </div>
+            <div class="sc-row"><span class="sc-lbl">Shift</span><span class="sc-val">1:00 PM – 5:00 PM EST</span></div>
+            <div class="sc-row"><span class="sc-lbl">Check-in</span><span class="sc-val" id="checkin-JC">—</span></div>
+            <div class="sc-row"><span class="sc-lbl">Check-out</span><span class="sc-val" id="checkout-JC">—</span></div>
+            <div class="sc-row"><span class="sc-lbl">Tickets today</span><span class="sc-val" id="tickets-JC">—</span></div>
+            <div class="sc-row"><span class="sc-lbl">Last updated</span><span class="sc-val" id="updated-JC" style="font-size:9px;color:var(--t3)">—</span></div>
+            <div class="tt"><div class="tt-fill" id="bar-JC" style="width:0%"></div></div>
           </div>
         </div>
+        <!-- WEEKLY SCHEDULE -->
         <div class="card">
-          <div class="card-hdr"><span class="card-hdr-t">Weekly schedule — Mar 23–29, 2026</span></div>
-          <div style="padding:12px;overflow-x:auto">
+          <div class="card-hdr"><span class="card-hdr-t">Weekly schedule</span><span class="card-hdr-s">All times EST</span></div>
+          <div style="padding:11px;overflow-x:auto">
             <table class="sched-tbl">
-              <thead><tr><th>Agent</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead>
+              <thead><tr><th>Agent</th><th>Shift hours</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead>
               <tbody>
-                <tr><td><div style="display:flex;align-items:center;gap:7px"><div class="av av-k" style="width:22px;height:22px;font-size:8px">KR</div>Kimberly</div></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-b">10–2</span></td><td><span class="pill p-gr">Off</span></td></tr>
-                <tr><td><div style="display:flex;align-items:center;gap:7px"><div class="av av-j" style="width:22px;height:22px;font-size:8px">JC</div>Jobelle</div></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-gr">Off</span></td><td><span class="pill p-b">10–2</span></td></tr>
-                <tr><td><div style="display:flex;align-items:center;gap:7px"><div class="av av-h" style="width:22px;height:22px;font-size:8px">HS</div>Harleen</div></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-g">9–5</span></td><td><span class="pill p-b">9–1</span></td><td><span class="pill p-gr">Off</span></td></tr>
+                <tr>
+                  <td><div style="display:flex;align-items:center;gap:6px"><div class="av av-k" style="width:20px;height:20px;font-size:7px">KR</div>Kimberly</div></td>
+                  <td style="font-size:9px;color:var(--t2);white-space:nowrap">8:30 AM – 12:30 PM</td>
+                  <td><span class="pill p-g" style="font-size:8px">8:30–12:30</span></td>
+                  <td><span class="pill p-g" style="font-size:8px">8:30–12:30</span></td>
+                  <td><span class="pill p-g" style="font-size:8px">8:30–12:30</span></td>
+                  <td><span class="pill p-g" style="font-size:8px">8:30–12:30</span></td>
+                  <td><span class="pill p-g" style="font-size:8px">8:30–12:30</span></td>
+                  <td><span class="pill p-b" style="font-size:8px">8:30–12:30</span></td>
+                  <td><span class="pill p-gr" style="font-size:8px">Off</span></td>
+                </tr>
+                <tr>
+                  <td><div style="display:flex;align-items:center;gap:6px"><div class="av av-j" style="width:20px;height:20px;font-size:7px">JC</div>Jobelle</div></td>
+                  <td style="font-size:9px;color:var(--t2);white-space:nowrap">1:00 PM – 5:00 PM</td>
+                  <td><span class="pill p-g" style="font-size:8px">1:00–5:00</span></td>
+                  <td><span class="pill p-g" style="font-size:8px">1:00–5:00</span></td>
+                  <td><span class="pill p-g" style="font-size:8px">1:00–5:00</span></td>
+                  <td><span class="pill p-g" style="font-size:8px">1:00–5:00</span></td>
+                  <td><span class="pill p-g" style="font-size:8px">1:00–5:00</span></td>
+                  <td><span class="pill p-gr" style="font-size:8px">Off</span></td>
+                  <td><span class="pill p-b" style="font-size:8px">1:00–5:00</span></td>
+                </tr>
               </tbody>
             </table>
           </div>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:13px">
+      <!-- RIGHT COLUMN -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <!-- CHECK-IN FORM -->
         <div class="card">
-          <div class="card-hdr"><span class="card-hdr-t">Log check-in / check-out</span></div>
+          <div class="card-hdr">
+            <span class="card-hdr-t">Log check-in / check-out</span>
+            <span class="card-hdr-s" id="sheet-status" style="color:#854f0b">Not connected</span>
+          </div>
           <div class="log-grid">
-            <div class="form-field" style="grid-column:1/-1"><div class="form-lbl">Agent</div><select><option>Kimberly Ross</option><option>Jobelle Cruz</option><option>Harleen Singh</option></select></div>
-            <div class="form-field"><div class="form-lbl">Action</div><select><option>Check in</option><option>Check out</option><option>Start break</option><option>End break</option></select></div>
-            <div class="form-field"><div class="form-lbl">Time</div><input type="time" value="09:00"></div>
-            <div class="form-field" style="grid-column:1/-1"><div class="form-lbl">Notes (optional)</div><input type="text" placeholder="Late reason, early leave, etc."></div>
-            <div style="grid-column:1/-1"><button class="btn-primary" style="width:100%">Submit log entry</button></div>
+            <div class="form-field" style="grid-column:1/-1">
+              <div class="form-lbl">Agent</div>
+              <select id="log-agent">
+                <option value="KR">Kimberly Ross</option>
+                <option value="JC">Jobelle Cruz</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <div class="form-lbl">Action</div>
+              <select id="log-action">
+                <option value="Check In">Check In</option>
+                <option value="Check Out">Check Out</option>
+                <option value="Start Break">Start Break</option>
+                <option value="End Break">End Break</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <div class="form-lbl">Time (EST)</div>
+              <input type="time" id="log-time">
+            </div>
+            <div class="form-field">
+              <div class="form-lbl">Tickets handled today</div>
+              <input type="number" id="log-tickets" placeholder="e.g. 14" min="0">
+            </div>
+            <div class="form-field" style="grid-column:1/-1">
+              <div class="form-lbl">Notes (optional)</div>
+              <input type="text" id="log-notes" placeholder="Late reason, early leave, notes...">
+            </div>
+            <div style="grid-column:1/-1">
+              <button class="btn-primary" style="width:100%" onclick="submitCheckin()">Submit log entry</button>
+            </div>
+            <div style="grid-column:1/-1;font-size:9px;color:var(--t3);text-align:center;min-height:16px" id="submit-msg"></div>
           </div>
         </div>
+        <!-- FOLLOW-UP CADENCE -->
         <div class="card">
-          <div class="card-hdr"><span class="card-hdr-t">Follow-up cadence due today</span></div>
+          <div class="card-hdr"><span class="card-hdr-t">Follow-up cadence — due today</span></div>
           <div style="padding:10px 14px">
-            <div class="cadence-row"><span class="pill p-a">Day 2</span><span style="flex:1">TKT-006 — first follow-up due</span><button class="btn-sm">Mark sent</button></div>
-            <div class="cadence-row"><span class="pill p-a">Day 2</span><span style="flex:1">CLM-002 — carrier follow-up (USPS)</span><button class="btn-sm">Mark sent</button></div>
-            <div class="cadence-row"><span class="pill p-g">On track</span><span style="flex:1">TKT-022 — listing team 48h check</span><button class="btn-sm">Confirm</button></div>
+            <div class="cad-row"><span class="pill p-a">Day 2</span><span style="flex:1">TKT-006 — first follow-up due</span><button class="btn-sm">Mark sent</button></div>
+            <div class="cad-row"><span class="pill p-a">Day 2</span><span style="flex:1">CLM-002 — carrier follow-up</span><button class="btn-sm">Mark sent</button></div>
+            <div class="cad-row"><span class="pill p-g">On track</span><span style="flex:1">TKT-022 — listing team 48h check</span></div>
           </div>
         </div>
+        <!-- CADENCE QUICK REF -->
         <div class="card">
-          <div class="card-hdr"><span class="card-hdr-t">Cadence rules — quick ref</span></div>
+          <div class="card-hdr"><span class="card-hdr-t">Cadence quick ref</span></div>
           <div style="padding:10px 14px">
-            <div class="cadence-row"><span class="pill p-b">Day 0</span><span>Send reply. Move to Waiting tab. Add date note.</span></div>
-            <div class="cadence-row"><span class="pill p-gr">Day 1</span><span>No action — allow 1 full business day.</span></div>
-            <div class="cadence-row"><span class="pill p-a">Day 2</span><span>Send first follow-up referencing original issue.</span></div>
-            <div class="cadence-row"><span class="pill p-a">Day 3</span><span>Final follow-up. Warn of closure.</span></div>
-            <div class="cadence-row"><span class="pill p-r">No reply</span><span>Close with D6. Internal note. NOT "Solved" — "Inactive".</span></div>
+            <div class="cad-row"><span class="pill p-b">Day 0</span><span>Send reply. Move to Waiting tab. Add date note.</span></div>
+            <div class="cad-row"><span class="pill p-gr">Day 1</span><span>No action — allow 1 full business day.</span></div>
+            <div class="cad-row"><span class="pill p-a">Day 2</span><span>Send first follow-up.</span></div>
+            <div class="cad-row"><span class="pill p-a">Day 3</span><span>Final follow-up. Warn of closure.</span></div>
+            <div class="cad-row"><span class="pill p-r">No reply</span><span>Close with D6. Mark Inactive — not Solved.</span></div>
           </div>
         </div>
       </div>
@@ -484,23 +546,13 @@ input:focus, select:focus, textarea:focus { outline:none; border-color:var(--blu
             <div style="padding-top:6px;border-top:1px solid var(--bd);font-size:9px;color:#a32d2d">Coaching note: Explain refund deductions upfront before escalating. Review SOP-012.</div>
           </div>
         </div>
-        <div class="agent-kpi-card">
-          <div class="akc-head"><div class="av av-h">HS</div><div style="flex:1"><div style="font-size:12px;font-weight:700">Harleen Singh</div><div style="font-size:9px;color:var(--t3)">Team Lead · All channels · Tech escalations</div></div><div class="score-ring pass"><div class="score-num pass">89</div></div><span class="pill p-g">Pass</span></div>
-          <div class="akc-body">
-            <div class="metric-row"><span class="metric-lbl">Tone & professionalism</span><div class="metric-bar"><div class="metric-fill" style="width:85%;background:var(--green)"></div></div><span class="metric-val">17/20</span></div>
-            <div class="metric-row"><span class="metric-lbl">Accuracy</span><div class="metric-bar"><div class="metric-fill" style="width:90%;background:var(--green)"></div></div><span class="metric-val">18/20</span></div>
-            <div class="metric-row"><span class="metric-lbl">SOP adherence</span><div class="metric-bar"><div class="metric-fill" style="width:95%;background:var(--green)"></div></div><span class="metric-val">19/20</span></div>
-            <div class="metric-row"><span class="metric-lbl">Response time</span><div class="metric-bar"><div class="metric-fill" style="width:75%;background:var(--amber)"></div></div><span class="metric-val">15/20</span></div>
-            <div class="metric-row"><span class="metric-lbl">Resolution quality</span><div class="metric-bar"><div class="metric-fill" style="width:100%;background:var(--green)"></div></div><span class="metric-val">20/20</span></div>
-            <div style="padding-top:6px;border-top:1px solid var(--bd);font-size:9px;color:var(--t3)">Reviewed Oct 25, 2025 by Supervisor · Ticket TKT-003</div>
-          </div>
-        </div>
+
       </div>
       <div style="display:flex;flex-direction:column;gap:13px">
         <div class="card">
           <div class="card-hdr"><span class="card-hdr-t">Log daily performance</span><span class="card-hdr-s">Self-reported by agents</span></div>
           <div class="log-grid">
-            <div class="form-field" style="grid-column:1/-1"><div class="form-lbl">Agent</div><select><option>Kimberly Ross</option><option>Jobelle Cruz</option><option>Harleen Singh</option></select></div>
+            <div class="form-field" style="grid-column:1/-1"><div class="form-lbl">Agent</div><select><option>Kimberly Ross</option><option>Jobelle Cruz</option></select></div>
             <div class="form-field"><div class="form-lbl">Date</div><input type="date" value="2026-03-25"></div>
             <div class="form-field"><div class="form-lbl">Marketplace</div><select><option>Amazon USA</option><option>Amazon CA</option><option>eBay USA</option><option>eBay CA</option><option>Shopify</option><option>Walmart</option><option>All</option></select></div>
             <div class="form-field"><div class="form-lbl">Tickets handled</div><input type="number" placeholder="e.g. 32" min="0"></div>
@@ -538,6 +590,114 @@ input:focus, select:focus, textarea:focus { outline:none; border-color:var(--blu
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE 6 — ADMIN PANEL
+       ══════════════════════════════════════════════════════ -->
+  <div class="page" id="p-admin">
+
+    <!-- PIN LOCK SCREEN -->
+    <div id="admin-lock" class="pin-screen">
+      <div style="font-size:32px">&#128274;</div>
+      <div class="pin-title">Admin Access</div>
+      <div class="pin-sub">Enter your 4-digit PIN to edit policies.<br>Only the account owner can access this panel.</div>
+      <input class="pin-input" type="password" maxlength="4" id="pin-input" placeholder="••••" oninput="checkPin(this.value)" autocomplete="off">
+      <div class="pin-error" id="pin-error">Incorrect PIN. Try again.</div>
+    </div>
+
+    <!-- ADMIN CONTENT (hidden until PIN entered) -->
+    <div id="admin-content" style="display:none;flex-direction:column;gap:14px">
+
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:16px;font-weight:700;color:var(--t1)">Policy Admin Panel</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:2px">Changes save to Google Sheets and go live for your team within 30 seconds</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="sheet-badge" id="admin-sheet-badge" style="background:#F1EFE8;color:#444441">Not connected</span>
+          <button class="btn-sm" onclick="lockAdmin()">&#128274; Lock</button>
+        </div>
+      </div>
+
+      <div class="alert-strip" id="admin-offline-notice">
+        Google Sheets not connected yet. Changes will show in the app but won't be saved permanently until you add your Script URL. Follow the setup guide to connect.
+      </div>
+
+      <!-- ADMIN TABS -->
+      <div class="admin-tabs">
+        <div class="admin-tab active" onclick="switchAdminTab('sops',this)">SOPs</div>
+        <div class="admin-tab" onclick="switchAdminTab('kpis',this)">KPI Targets</div>
+        <div class="admin-tab" onclick="switchAdminTab('conduct',this)">Agent Conduct</div>
+        <div class="admin-tab" onclick="switchAdminTab('carriers',this)">Carriers</div>
+        <div class="admin-tab" onclick="switchAdminTab('pin',this)">Change PIN</div>
+      </div>
+
+      <!-- SOPs EDITOR -->
+      <div class="admin-panel active" id="admin-sops">
+        <div class="admin-header">
+          <div><div class="admin-header-t">SOPs</div><div class="admin-header-s">Edit step-by-step procedures. Changes update the Policy Dashboard and Decision Engine.</div></div>
+          <button class="btn-sm btn-primary" onclick="addSOP()">+ Add SOP</button>
+        </div>
+        <div id="sop-editor-list"></div>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn-primary" onclick="saveSection('sops')" style="flex:1">Save all SOP changes</button>
+          <span class="save-indicator" id="save-sops"></span>
+        </div>
+      </div>
+
+      <!-- KPI TARGETS EDITOR -->
+      <div class="admin-panel" id="admin-kpis">
+        <div class="admin-header">
+          <div><div class="admin-header-t">KPI Targets</div><div class="admin-header-s">Update targets and benchmarks. Agents see these in the KPI dashboard.</div></div>
+        </div>
+        <div id="kpi-editor-list"></div>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn-primary" onclick="saveSection('kpis')" style="flex:1">Save all KPI changes</button>
+          <span class="save-indicator" id="save-kpis"></span>
+        </div>
+      </div>
+
+      <!-- CONDUCT EDITOR -->
+      <div class="admin-panel" id="admin-conduct">
+        <div class="admin-header">
+          <div><div class="admin-header-t">Agent Conduct Rules</div><div class="admin-header-s">Edit the 9 core principles. Agents see these in Policy Dashboard → Agent Conduct.</div></div>
+          <button class="btn-sm btn-primary" onclick="addConduct()">+ Add rule</button>
+        </div>
+        <div id="conduct-editor-list"></div>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn-primary" onclick="saveSection('conduct')" style="flex:1">Save all conduct changes</button>
+          <span class="save-indicator" id="save-conduct"></span>
+        </div>
+      </div>
+
+      <!-- CARRIERS EDITOR -->
+      <div class="admin-panel" id="admin-carriers">
+        <div class="admin-header">
+          <div><div class="admin-header-t">Carrier Contacts</div><div class="admin-header-s">Update phone numbers, wait times, and contact methods.</div></div>
+          <button class="btn-sm btn-primary" onclick="addCarrier()">+ Add carrier</button>
+        </div>
+        <div id="carrier-editor-list"></div>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn-primary" onclick="saveSection('carriers')" style="flex:1">Save all carrier changes</button>
+          <span class="save-indicator" id="save-carriers"></span>
+        </div>
+      </div>
+
+      <!-- PIN CHANGE -->
+      <div class="admin-panel" id="admin-pin">
+        <div class="admin-header"><div><div class="admin-header-t">Change PIN</div><div class="admin-header-s">Update your 4-digit admin PIN.</div></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px;max-width:300px">
+          <div class="form-field"><div class="form-lbl">Current PIN</div><input type="password" maxlength="4" id="pin-current" placeholder="Enter current PIN"></div>
+          <div class="form-field"><div class="form-lbl">New PIN</div><input type="password" maxlength="4" id="pin-new" placeholder="Enter new 4-digit PIN"></div>
+          <div class="form-field"><div class="form-lbl">Confirm new PIN</div><input type="password" maxlength="4" id="pin-confirm" placeholder="Repeat new PIN"></div>
+          <button class="btn-primary" onclick="changePIN()">Update PIN</button>
+          <div id="pin-change-msg" style="font-size:10px;color:var(--t3)"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1073,6 +1233,498 @@ function copyTmpl(code) {
 resetWizard();
 buildPolList('all');
 buildTmplList();
+
+
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN PANEL — PIN, DATA EDITING, GOOGLE SHEETS SYNC
+// ═══════════════════════════════════════════════════════════
+
+// ── Default data stores (loaded from Google Sheets or defaults) ──
+var ADMIN_PIN = '1234'; // Change this to your preferred PIN
+
+var ADMIN_DATA = {
+  sops: [
+    { id:'SOP-001', title:'Cancellation — item NOT yet shipped', trigger:'Customer requests cancel before shipping label printed', steps:'1. Check Linnworks Open Orders — confirm no label printed.
+2. Park order in Linnworks immediately.
+3. Notify shipping team before cancelling.
+4. Cancel: Linnworks → ShipStation → Marketplace.
+5. Email buyer confirming cancellation and full refund.', templates:'Cancellation confirmation email', escalate:'Shipping label already printed — consult shipping team first.' },
+    { id:'SOP-003', title:'Damaged item — complete/major damage', trigger:'Item arrived completely damaged, broken, or leaking', steps:'1. Send A2. Ask: What damaged? Entire item or part? Box also damaged?
+2. Box AND product damaged → carrier fault → open carrier claim AND offer resolution.
+3. Product damaged, box intact → packing issue → offer resolution, no carrier claim.
+4. Assess if worth returning: expensive+resellable = return. Destroyed = no return.
+5. Resend: create in Linnworks, ship within 1 business day, send B7.', templates:'A2, B7', escalate:'High-value item or resolution you cannot authorize.' },
+    { id:'SOP-006', title:'Wrong item sent by MSHZ', trigger:'Customer received different item, wrong size, wrong color, or wrong quantity', steps:'1. Ask customer: What item did you receive? Confirm exactly.
+2. Seller error confirmed. Investigate: wrong pick or Linnworks SKU link error? Notify supervisor.
+3. FBA ORDER: Do NOT direct to Amazon. Escalate to supervisor BEFORE acting.
+4. Offer resend or full refund per customer preference.
+5. Resend: create in Linnworks, ship within 1 business day, send B7.
+6. Return: provide prepaid label — MSHZ pays all costs.', templates:'B7', escalate:'FBA wrong item — escalate IMMEDIATELY before contacting customer.' },
+    { id:'SOP-009', title:'Delivered — customer not received', trigger:'Tracking shows delivered but customer says not received', steps:'1. Confirm 4 points: address correct? household member received? post office holding? neighbor received?
+2. Send B3 — notify customer of delivery confirmation.
+3. Open carrier search SAME DAY — do not wait.
+4. Notify: "Investigating — allow 2 business days."
+5. After 2 BD: located → new ETA. Not located → resend or full refund.', templates:'B3, B3-3, B3-4', escalate:'High-value item — supervisor approval before resend or refund.' },
+    { id:'SOP-016', title:'Listing inaccuracy reported by customer', trigger:'Customer states description, photo, quantity, or specs are wrong', steps:'1. Resolve the customer issue first using appropriate SOP.
+2. Do NOT close ticket without completing Step 3.
+3. Submit listing inaccuracy report to listings team: marketplace+ASIN, customer quote, what listing shows, order ID.
+4. Add internal eDesk note: "Listing report submitted on [date]."
+5. Close ticket ONLY after report is submitted.', templates:'Resolution template + internal note', escalate:'Listings team does not action within 48 hours — escalate to supervisor.' }
+  ],
+  kpis: [
+    { metric:'Response time — all messages', target:'Under 24h, 7 days/week', current:'3.09h avg', status:'good' },
+    { metric:'Return request response', target:'Within 48h — zero exceptions', current:'Critical policy', status:'alert' },
+    { metric:'Order Defect Rate (ODR)', target:'Below 1% (target 0.5%)', current:'Below 1% — monitor', status:'alert' },
+    { metric:'Buyer contact rate', target:'Below 1.63%', current:'Currently 2.14%', status:'warn' },
+    { metric:'Buyer dissatisfaction rate', target:'Below 6.47%', current:'Currently 14.29%', status:'alert' },
+    { metric:'365-day positive rate', target:'Above 90%', current:'Currently 80%', status:'warn' },
+    { metric:'365-day negative rate', target:'Below 5%', current:'Currently 19%', status:'alert' },
+    { metric:'Lifetime feedback rating', target:'4.5+ stars', current:'4.8 stars (12,462)', status:'good' },
+    { metric:'QA score (monthly)', target:'75/100 to pass', current:'Team avg: 82', status:'good' }
+  ],
+  conduct: [
+    { num:'1', rule:'Get organized', detail:'Track all conversations in eDesk. Document every action taken before closing.' },
+    { num:'2', rule:'Read the entire thread first', detail:'Before sending any reply, read every message. Understand what the customer needs before responding.' },
+    { num:'3', rule:'Every reply must move the ticket forward', detail:'Each message is one concrete step toward resolution. No filler messages.' },
+    { num:'4', rule:'Personalize every interaction', detail:'Use customer name, reference their specific order, tailor reply to their situation.' },
+    { num:'5', rule:'Response time: 24 hours or less — 7 days a week', detail:'Includes weekends and holidays. Weekend coverage is in place. Non-negotiable Amazon policy.' },
+    { num:'6', rule:'Do not take hostile customers personally', detail:'Stay professional and calm. Escalate to team lead if needed.' },
+    { num:'7', rule:'Underpromise, overdeliver', detail:'Never give delivery estimate without confirming with warehouse.' },
+    { num:'8', rule:'The customer is always right', detail:'Work toward resolution even if customer is factually incorrect. Your job is to solve, not debate.' },
+    { num:'9', rule:'Document every action before closing', detail:'Leave a clear note on every ticket summarizing what was done and why.' }
+  ],
+  carriers: [
+    { name:'USPS', region:'USA', contact:'usps.com/help/claims.htm', method:'Online portal', minWait:'7 days after mailing', notes:'Search requests filed online. Minimum 7 days — do not file earlier.' },
+    { name:'UPS', region:'USA & CA', contact:'1-800-742-5877', method:'Phone', minWait:'5 business days', notes:'Phone only for investigations and claims.' },
+    { name:'Canada Post', region:'CA', contact:'1-866-607-6301', method:'Phone', minWait:'5 business days', notes:'Canadian domestic shipments.' },
+    { name:'Stallion Express', region:'CA', contact:'stallionexpress.ca/support', method:'Portal', minWait:'3 business days', notes:'Canadian fulfillment hub.' },
+    { name:'ChitChats', region:'CA', contact:'chitchats.com', method:'Portal', minWait:'3 business days', notes:'Lightweight Canadian parcels.' },
+    { name:'FedEx', region:'USA', contact:'1-800-463-3339', method:'Phone', minWait:'5 business days', notes:'' }
+  ]
+};
+
+// ── PIN Functions ─────────────────────────────────────────────────────────────
+function checkPin(val) {
+  if (val.length < 4) return;
+  if (val === ADMIN_PIN) {
+    document.getElementById('admin-lock').style.display = 'none';
+    document.getElementById('admin-content').style.display = 'flex';
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-error').style.display = 'none';
+    loadAdminEditors();
+    checkAdminSheetStatus();
+  } else if (val.length === 4) {
+    document.getElementById('pin-error').style.display = 'block';
+    document.getElementById('pin-input').value = '';
+    setTimeout(function(){ document.getElementById('pin-error').style.display='none'; }, 2000);
+  }
+}
+
+function lockAdmin() {
+  document.getElementById('admin-lock').style.display = 'flex';
+  document.getElementById('admin-content').style.display = 'none';
+  nav('decision', document.querySelector('.si'));
+}
+
+function changePIN() {
+  var cur = document.getElementById('pin-current').value;
+  var nw  = document.getElementById('pin-new').value;
+  var cnf = document.getElementById('pin-confirm').value;
+  var msg = document.getElementById('pin-change-msg');
+  if (cur !== ADMIN_PIN) { msg.textContent = 'Current PIN is incorrect.'; msg.style.color='#a32d2d'; return; }
+  if (nw.length !== 4 || isNaN(nw)) { msg.textContent = 'New PIN must be exactly 4 digits.'; msg.style.color='#a32d2d'; return; }
+  if (nw !== cnf) { msg.textContent = 'New PINs do not match.'; msg.style.color='#a32d2d'; return; }
+  ADMIN_PIN = nw;
+  msg.textContent = 'PIN updated successfully. Remember your new PIN — it resets if you reload the page unless saved to Google Sheets.';
+  msg.style.color = '#3b6d11';
+  document.getElementById('pin-current').value = '';
+  document.getElementById('pin-new').value = '';
+  document.getElementById('pin-confirm').value = '';
+}
+
+// ── Admin Tab Switcher ────────────────────────────────────────────────────────
+function switchAdminTab(tab, el) {
+  document.querySelectorAll('.admin-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.admin-panel').forEach(function(p){ p.classList.remove('active'); });
+  el.classList.add('active');
+  document.getElementById('admin-' + tab).classList.add('active');
+}
+
+// ── Load all editors ──────────────────────────────────────────────────────────
+function loadAdminEditors() {
+  renderSOPEditor();
+  renderKPIEditor();
+  renderConductEditor();
+  renderCarrierEditor();
+}
+
+// ── SOP EDITOR ────────────────────────────────────────────────────────────────
+function renderSOPEditor() {
+  var el = document.getElementById('sop-editor-list');
+  el.innerHTML = ADMIN_DATA.sops.map(function(s, i) {
+    return '<div class="edit-row-full" id="sop-item-'+i+'">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
+        '<span style="font-size:11px;font-weight:700;color:#185fa5;background:#e6f1fb;padding:2px 8px;border-radius:5px">'+s.id+'</span>' +
+        '<input type="text" value="'+escHtml(s.title)+'" onchange="ADMIN_DATA.sops['+i+'].title=this.value" style="flex:1;font-weight:700" placeholder="SOP title">' +
+        '<button class="delete-btn" onclick="deleteSOP('+i+')">Remove</button>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+        '<div class="form-field"><div class="form-lbl">Trigger / When to use</div>' +
+          '<input type="text" value="'+escHtml(s.trigger)+'" onchange="ADMIN_DATA.sops['+i+'].trigger=this.value" placeholder="When does agent use this SOP?"></div>' +
+        '<div class="form-field"><div class="form-lbl">Templates to use</div>' +
+          '<input type="text" value="'+escHtml(s.templates)+'" onchange="ADMIN_DATA.sops['+i+'].templates=this.value" placeholder="e.g. A2, B7"></div>' +
+      '</div>' +
+      '<div class="form-field"><div class="form-lbl">Step-by-step process (one step per line, start with 1. 2. 3.)</div>' +
+        '<textarea rows="5" onchange="ADMIN_DATA.sops['+i+'].steps=this.value" style="font-family:monospace;font-size:10px">'+escHtml(s.steps)+'</textarea></div>' +
+      '<div class="form-field"><div class="form-lbl">Escalate if</div>' +
+        '<input type="text" value="'+escHtml(s.escalate)+'" onchange="ADMIN_DATA.sops['+i+'].escalate=this.value" placeholder="When should agent escalate to supervisor?"></div>' +
+    '</div>';
+  }).join('');
+}
+
+function addSOP() {
+  ADMIN_DATA.sops.push({ id:'SOP-NEW', title:'New SOP', trigger:'', steps:'1. 
+2. 
+3. ', templates:'', escalate:'' });
+  renderSOPEditor();
+  document.getElementById('sop-editor-list').lastElementChild.scrollIntoView({behavior:'smooth'});
+}
+
+function deleteSOP(i) {
+  if (confirm('Remove this SOP? This cannot be undone.')) {
+    ADMIN_DATA.sops.splice(i, 1);
+    renderSOPEditor();
+  }
+}
+
+// ── KPI EDITOR ────────────────────────────────────────────────────────────────
+function renderKPIEditor() {
+  var el = document.getElementById('kpi-editor-list');
+  el.innerHTML = ADMIN_DATA.kpis.map(function(k, i) {
+    return '<div class="edit-row" style="grid-template-columns:minmax(0,2fr) minmax(0,2fr) minmax(0,1fr) auto">' +
+      '<div class="form-field"><div class="form-lbl">Metric name</div>' +
+        '<input type="text" value="'+escHtml(k.metric)+'" onchange="ADMIN_DATA.kpis['+i+'].metric=this.value"></div>' +
+      '<div class="form-field"><div class="form-lbl">Target</div>' +
+        '<input type="text" value="'+escHtml(k.target)+'" onchange="ADMIN_DATA.kpis['+i+'].target=this.value"></div>' +
+      '<div class="form-field"><div class="form-lbl">Current performance</div>' +
+        '<input type="text" value="'+escHtml(k.current)+'" onchange="ADMIN_DATA.kpis['+i+'].current=this.value"></div>' +
+      '<div class="form-field"><div class="form-lbl">Status</div>' +
+        '<select onchange="ADMIN_DATA.kpis['+i+'].status=this.value">' +
+          '<option value="good"'+(k.status==='good'?' selected':'')+'>Good</option>' +
+          '<option value="warn"'+(k.status==='warn'?' selected':'')+'>Monitor</option>' +
+          '<option value="alert"'+(k.status==='alert'?' selected':'')+'>Action needed</option>' +
+        '</select></div>' +
+    '</div>';
+  }).join('');
+}
+
+// ── CONDUCT EDITOR ────────────────────────────────────────────────────────────
+function renderConductEditor() {
+  var el = document.getElementById('conduct-editor-list');
+  el.innerHTML = ADMIN_DATA.conduct.map(function(c, i) {
+    return '<div class="edit-row" style="grid-template-columns:40px minmax(0,1fr) minmax(0,2fr) auto">' +
+      '<div style="font-size:20px;font-weight:700;color:#185fa5;padding-top:8px;text-align:center">'+c.num+'</div>' +
+      '<div class="form-field"><div class="form-lbl">Rule name</div>' +
+        '<input type="text" value="'+escHtml(c.rule)+'" onchange="ADMIN_DATA.conduct['+i+'].rule=this.value"></div>' +
+      '<div class="form-field"><div class="form-lbl">Full description</div>' +
+        '<input type="text" value="'+escHtml(c.detail)+'" onchange="ADMIN_DATA.conduct['+i+'].detail=this.value"></div>' +
+      '<button class="delete-btn" style="margin-top:20px" onclick="deleteConduct('+i+')">&#10005;</button>' +
+    '</div>';
+  }).join('');
+}
+
+function addConduct() {
+  var num = ADMIN_DATA.conduct.length + 1;
+  ADMIN_DATA.conduct.push({ num:String(num), rule:'New rule', detail:'Description of what this means in practice.' });
+  renderConductEditor();
+}
+
+function deleteConduct(i) {
+  ADMIN_DATA.conduct.splice(i, 1);
+  ADMIN_DATA.conduct.forEach(function(c,idx){ c.num = String(idx+1); });
+  renderConductEditor();
+}
+
+// ── CARRIER EDITOR ────────────────────────────────────────────────────────────
+function renderCarrierEditor() {
+  var el = document.getElementById('carrier-editor-list');
+  el.innerHTML = ADMIN_DATA.carriers.map(function(c, i) {
+    return '<div class="edit-row-full">' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:end">' +
+        '<div class="form-field"><div class="form-lbl">Carrier name</div>' +
+          '<input type="text" value="'+escHtml(c.name)+'" onchange="ADMIN_DATA.carriers['+i+'].name=this.value"></div>' +
+        '<div class="form-field"><div class="form-lbl">Region</div>' +
+          '<input type="text" value="'+escHtml(c.region)+'" onchange="ADMIN_DATA.carriers['+i+'].region=this.value"></div>' +
+        '<div class="form-field"><div class="form-lbl">Contact / Number</div>' +
+          '<input type="text" value="'+escHtml(c.contact)+'" onchange="ADMIN_DATA.carriers['+i+'].contact=this.value"></div>' +
+        '<div class="form-field"><div class="form-lbl">Min. wait for claim</div>' +
+          '<input type="text" value="'+escHtml(c.minWait)+'" onchange="ADMIN_DATA.carriers['+i+'].minWait=this.value"></div>' +
+        '<button class="delete-btn" onclick="deleteCarrier('+i+')">&#10005;</button>' +
+      '</div>' +
+      '<div class="form-field"><div class="form-lbl">Notes</div>' +
+        '<input type="text" value="'+escHtml(c.notes)+'" onchange="ADMIN_DATA.carriers['+i+'].notes=this.value" placeholder="Any special instructions..."></div>' +
+    '</div>';
+  }).join('');
+}
+
+function addCarrier() {
+  ADMIN_DATA.carriers.push({ name:'New Carrier', region:'', contact:'', method:'', minWait:'', notes:'' });
+  renderCarrierEditor();
+}
+
+function deleteCarrier(i) {
+  if (confirm('Remove this carrier?')) { ADMIN_DATA.carriers.splice(i,1); renderCarrierEditor(); }
+}
+
+// ── SAVE TO GOOGLE SHEETS ─────────────────────────────────────────────────────
+function saveSection(section) {
+  var indicator = document.getElementById('save-' + section);
+  indicator.style.display = 'inline-block';
+  indicator.className = 'save-indicator';
+  indicator.textContent = 'Saving...';
+  indicator.style.background = '#F1EFE8';
+  indicator.style.color = '#444441';
+
+  if (SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+    // Local only — data is in memory, will reset on reload
+    setTimeout(function(){
+      indicator.textContent = 'Saved locally (connect Google Sheets to persist)';
+      indicator.className = 'save-indicator save-ok';
+      indicator.style.background = '#FAEEDA';
+      indicator.style.color = '#633806';
+    }, 400);
+    return;
+  }
+
+  var payload = { action: 'saveSection', section: section, data: ADMIN_DATA[section] };
+
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d.success) {
+      indicator.textContent = 'Saved — agents see update within 30 seconds';
+      indicator.className = 'save-indicator save-ok';
+    } else {
+      indicator.textContent = 'Error: ' + (d.error||'Unknown');
+      indicator.className = 'save-indicator save-err';
+    }
+  })
+  .catch(function(){
+    indicator.textContent = 'Connection error — check Script URL';
+    indicator.className = 'save-indicator save-err';
+  });
+}
+
+// ── Check admin sheet connection status ───────────────────────────────────────
+function checkAdminSheetStatus() {
+  var badge = document.getElementById('admin-sheet-badge');
+  var notice = document.getElementById('admin-offline-notice');
+  if (SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+    badge.textContent = 'Not connected — changes are local only';
+    badge.style.background = '#FAEEDA'; badge.style.color = '#633806';
+    notice.style.display = 'block';
+  } else {
+    badge.textContent = 'Connected to Google Sheets';
+    badge.style.background = '#EAF3DE'; badge.style.color = '#27500A';
+    notice.style.display = 'none';
+  }
+}
+
+// ── Helper ─────────────────────────────────────────────────────────────────────
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════════════════
+// GOOGLE SHEETS LIVE SHIFT INTEGRATION
+// ═══════════════════════════════════════════════════════════
+// STEP 1: Paste your Google Apps Script Web App URL below
+var SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
+
+// Scheduled times (EST) for status calculation
+var SCHEDULES = {
+  KR: { inH:8, inM:30, outH:12, outM:30 },
+  JC: { inH:13, inM:0, outH:17, outM:0 }
+};
+
+function getESTNow() {
+  var now = new Date();
+  // Convert to EST (UTC-5) or EDT (UTC-4)
+  var utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  var est = new Date(utc + (-5 * 3600000));
+  return est;
+}
+
+function timeStrToMins(str) {
+  if (!str || str === '—') return null;
+  str = str.replace(/\s*(AM|PM)/i,'');
+  var parts = str.split(':');
+  var h = parseInt(parts[0]);
+  var m = parseInt(parts[1]||0);
+  if (/PM/i.test(arguments[0]) && h !== 12) h += 12;
+  if (/AM/i.test(arguments[0]) && h === 12) h = 0;
+  return h * 60 + m;
+}
+
+function calcStatus(agent, checkinVal, checkoutVal) {
+  var now = getESTNow();
+  var nowMins = now.getHours() * 60 + now.getMinutes();
+  var sched = SCHEDULES[agent];
+  var schedInMins = sched.inH * 60 + sched.inM;
+  var schedOutMins = sched.outH * 60 + sched.outM;
+
+  if (checkoutVal && checkoutVal !== '—') {
+    return { text:'Checked out', bg:'#F1EFE8', color:'#444441' };
+  }
+  if (!checkinVal || checkinVal === '—') {
+    if (nowMins > schedOutMins) return { text:'Absent', bg:'#FCEBEB', color:'#791F1F' };
+    if (nowMins > schedInMins + 10) return { text:'Not checked in', bg:'#FCEBEB', color:'#791F1F' };
+    return { text:'Not started', bg:'#F1EFE8', color:'#444441' };
+  }
+  // They have checked in
+  var cinMins = timeStrToMins(checkinVal);
+  if (cinMins !== null && cinMins > schedInMins + 10) {
+    return { text:'Late', bg:'#FAEEDA', color:'#633806' };
+  }
+  return { text:'On shift', bg:'#EAF3DE', color:'#27500A' };
+}
+
+function updateCard(agent, row) {
+  var checkin  = row.checkin  || '—';
+  var checkout = row.checkout || '—';
+  var tickets  = row.tickets  || '—';
+  var notes    = row.notes    || '';
+  var ts       = row.timestamp || '—';
+
+  document.getElementById('checkin-'  + agent).textContent = checkin;
+  document.getElementById('checkout-' + agent).textContent = checkout;
+  document.getElementById('tickets-'  + agent).textContent = tickets;
+  document.getElementById('updated-'  + agent).textContent = ts;
+
+  var status = calcStatus(agent, checkin, checkout);
+  var badge = document.getElementById('badge-' + agent);
+  badge.textContent = status.text;
+  badge.style.background = status.bg;
+  badge.style.color = status.color;
+
+  // Progress bar — percentage of shift elapsed
+  var sched = SCHEDULES[agent];
+  var now = getESTNow();
+  var nowMins = now.getHours() * 60 + now.getMinutes();
+  var schedInMins = sched.inH * 60 + sched.inM;
+  var schedOutMins = sched.outH * 60 + sched.outM;
+  var shiftLen = schedOutMins - schedInMins;
+  var elapsed = Math.max(0, Math.min(shiftLen, nowMins - schedInMins));
+  var pct = shiftLen > 0 ? Math.round((elapsed / shiftLen) * 100) : 0;
+  document.getElementById('bar-' + agent).style.width = pct + '%';
+}
+
+function loadShiftData() {
+  if (SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+    document.getElementById('sheet-status').textContent = 'Set up Google Sheets to go live';
+    document.getElementById('sheet-status').style.color = '#854f0b';
+    // Show placeholder dashes
+    ['KR','JC'].forEach(function(a) {
+      document.getElementById('badge-' + a).textContent = 'Offline';
+      document.getElementById('badge-' + a).style.background = '#F1EFE8';
+      document.getElementById('badge-' + a).style.color = '#444441';
+    });
+    return;
+  }
+  fetch(SCRIPT_URL + '?action=getToday')
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      document.getElementById('sheet-status').textContent = 'Live · updates every 30s';
+      document.getElementById('sheet-status').style.color = '#3b6d11';
+      if (data.KR) updateCard('KR', data.KR);
+      if (data.JC) updateCard('JC', data.JC);
+    })
+    .catch(function(e) {
+      document.getElementById('sheet-status').textContent = 'Connection error — retrying...';
+      document.getElementById('sheet-status').style.color = '#a32d2d';
+    });
+}
+
+function submitCheckin() {
+  var agent   = document.getElementById('log-agent').value;
+  var action  = document.getElementById('log-action').value;
+  var time    = document.getElementById('log-time').value;
+  var tickets = document.getElementById('log-tickets').value;
+  var notes   = document.getElementById('log-notes').value;
+  var msg     = document.getElementById('submit-msg');
+
+  if (!time) { msg.textContent = 'Please enter a time.'; msg.style.color='#a32d2d'; return; }
+
+  // Format time to 12h
+  var parts = time.split(':');
+  var h = parseInt(parts[0]); var m = parts[1];
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  var h12 = h % 12 || 12;
+  var timeStr = h12 + ':' + m + ' ' + ampm;
+
+  if (SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+    // Demo mode — update UI locally without saving
+    var row = {
+      checkin: action === 'Check In' ? timeStr : document.getElementById('checkin-' + agent).textContent,
+      checkout: action === 'Check Out' ? timeStr : document.getElementById('checkout-' + agent).textContent,
+      tickets: tickets || document.getElementById('tickets-' + agent).textContent,
+      timestamp: 'Just now',
+      notes: notes
+    };
+    updateCard(agent, row);
+    msg.textContent = 'Updated locally (demo mode — connect Google Sheets to save permanently)';
+    msg.style.color = '#854f0b';
+    return;
+  }
+
+  msg.textContent = 'Saving...';
+  msg.style.color = 'var(--t3)';
+
+  var payload = { action:'log', agent:agent, type:action, time:timeStr, tickets:tickets, notes:notes };
+
+  fetch(SCRIPT_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data) {
+    if (data.success) {
+      msg.textContent = action + ' logged for ' + (agent==='KR'?'Kimberly':'Jobelle') + ' at ' + timeStr;
+      msg.style.color = '#3b6d11';
+      document.getElementById('log-tickets').value = '';
+      document.getElementById('log-notes').value = '';
+      loadShiftData(); // refresh cards immediately
+    } else {
+      msg.textContent = 'Error: ' + (data.error || 'Unknown error');
+      msg.style.color = '#a32d2d';
+    }
+  })
+  .catch(function(e) {
+    msg.textContent = 'Connection failed. Check your Google Script URL.';
+    msg.style.color = '#a32d2d';
+  });
+}
+
+// Set current time in the form on load
+(function(){
+  var now = getESTNow();
+  var h = String(now.getHours()).padStart(2,'0');
+  var m = String(now.getMinutes()).padStart(2,'0');
+  var inp = document.getElementById('log-time');
+  if (inp) inp.value = h + ':' + m;
+})();
+
+// Load shift data on start, then every 30 seconds
+loadShiftData();
+setInterval(loadShiftData, 30000);
+
 </script>
 </body>
 </html>
